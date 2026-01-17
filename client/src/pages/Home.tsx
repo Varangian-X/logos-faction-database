@@ -246,6 +246,7 @@ export default function Home() {
           </div>
           <div>Factions: {factions.length} // Cycle: 30,492 AD</div>
           <a href="/network" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">NETWORK VIEW</a>
+          <a href="/timeline" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">TIMELINE</a>
         </div>
       </header>
 
