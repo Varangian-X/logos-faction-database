@@ -4,20 +4,22 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { CampaignProvider } from "./contexts/CampaignContext";
 import Home from "./pages/Home";
 import Network from "./pages/Network";
 import Timeline from "./pages/Timeline";
 import Map from "./pages/Map";
-
+import Campaign from "./pages/Campaign";
 
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/network"} component={Network} />
-      <Route path={"/timeline"} component={Timeline} />
-      <Route path={"/map"} component={Map} />
-      <Route path={"/404"} component={NotFound} />
+      <Route path="/" component={Home} />
+      <Route path="/network" component={Network} />
+      <Route path="/timeline" component={Timeline} />
+      <Route path="/map" component={Map} />
+      <Route path="/campaign" component={Campaign} />
+      <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>
@@ -36,10 +38,12 @@ function App() {
         defaultTheme="light"
         // switchable
       >
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+        <CampaignProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </CampaignProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

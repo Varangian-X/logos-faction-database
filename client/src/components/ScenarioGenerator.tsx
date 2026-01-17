@@ -5,7 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { generateScenario, Scenario } from "@/lib/scenarioGenerator";
 import { MapLocation } from "@/lib/mapData";
-import { Sparkles, Target, AlertTriangle, Gift, RefreshCw } from "lucide-react";
+import { Sparkles, Target, AlertTriangle, Gift, RefreshCw, Save, Check } from "lucide-react";
+import { useCampaign } from "@/contexts/CampaignContext";
+import { toast } from "sonner";
 
 interface ScenarioGeneratorProps {
   location: MapLocation;
@@ -14,10 +16,32 @@ interface ScenarioGeneratorProps {
 
 export const ScenarioGenerator: React.FC<ScenarioGeneratorProps> = ({ location, year }) => {
   const [scenario, setScenario] = useState<Scenario | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
+  const { saveScenario } = useCampaign();
 
   const handleGenerate = () => {
     const newScenario = generateScenario(location, year);
     setScenario(newScenario);
+    setIsSaved(false);
+  };
+
+  const handleSave = () => {
+    if (!scenario) return;
+    
+    saveScenario({
+      title: scenario.title,
+      type: scenario.type,
+      description: scenario.description,
+      location: location.name,
+      faction: location.controllingFaction,
+      year: year,
+      objectives: scenario.objectives,
+      complications: scenario.complications,
+      rewards: scenario.rewards,
+    });
+    
+    setIsSaved(true);
+    toast.success("Scenario saved to Campaign Log");
   };
 
   return (
@@ -40,9 +64,21 @@ export const ScenarioGenerator: React.FC<ScenarioGeneratorProps> = ({ location, 
                   {scenario.type.toUpperCase()} // {year} AD
                 </CardDescription>
               </div>
-              <Button variant="ghost" size="icon" onClick={handleGenerate} className="h-6 w-6">
-                <RefreshCw className="w-3 h-3" />
-              </Button>
+              <div className="flex gap-1">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={handleSave} 
+                  disabled={isSaved}
+                  className="h-6 w-6 hover:text-[#D4AF37]"
+                  title="Save to Campaign"
+                >
+                  {isSaved ? <Check className="w-3 h-3 text-green-500" /> : <Save className="w-3 h-3" />}
+                </Button>
+                <Button variant="ghost" size="icon" onClick={handleGenerate} className="h-6 w-6" title="Regenerate">
+                  <RefreshCw className="w-3 h-3" />
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
