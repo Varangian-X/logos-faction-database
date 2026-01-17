@@ -5,9 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Link } from "wouter";
-import { ArrowLeft, Trash2, MapPin, Calendar, Flag, Target, AlertTriangle, Gift, FileText } from "lucide-react";
+import { ArrowLeft, Trash2, MapPin, Calendar, Flag, Target, AlertTriangle, Gift, FileText, Download, FileJson } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
+import { exportCampaignToJSON, exportCampaignToPDF } from "@/lib/campaignExport";
 
 export default function CampaignPage() {
   const { savedScenarios, deleteScenario, updateScenarioNotes, clearCampaign } = useCampaign();
@@ -34,15 +35,38 @@ export default function CampaignPage() {
           </div>
         </div>
         {savedScenarios.length > 0 && (
-          <Button 
-            variant="destructive" 
-            size="sm" 
-            onClick={clearCampaign}
-            className="bg-red-900/20 hover:bg-red-900/40 text-red-400 border border-red-900/50"
-          >
-            <Trash2 className="w-3 h-3 mr-2" />
-            Clear Log
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => exportCampaignToPDF(savedScenarios)}
+              className="bg-white/5 hover:bg-white/10 text-white border-white/20"
+              title="Export as PDF"
+            >
+              <Download className="w-3 h-3 mr-2" />
+              PDF
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => exportCampaignToJSON(savedScenarios)}
+              className="bg-white/5 hover:bg-white/10 text-white border-white/20"
+              title="Export as JSON"
+            >
+              <FileJson className="w-3 h-3 mr-2" />
+              JSON
+            </Button>
+            <div className="w-px h-8 bg-white/10 mx-2" />
+            <Button 
+              variant="destructive" 
+              size="sm" 
+              onClick={clearCampaign}
+              className="bg-red-900/20 hover:bg-red-900/40 text-red-400 border border-red-900/50"
+            >
+              <Trash2 className="w-3 h-3 mr-2" />
+              Clear Log
+            </Button>
+          </div>
         )}
       </header>
 
