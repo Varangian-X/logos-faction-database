@@ -16,8 +16,8 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedLocation, setSelectedLocation] = useState<MapLocation | null>(null);
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(2);
+  const [pan, setPan] = useState({ x: 50, y: 50 });
   const [hoveredLocation, setHoveredLocation] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -54,38 +54,26 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
       ctx.stroke();
     }
 
-    // Draw regions as background areas
+    // Draw regions as background areas using bounds
     mapRegions.forEach(region => {
       const regionColor = region.color;
       ctx.fillStyle = regionColor + "08";
-      ctx.strokeStyle = regionColor + "20";
+      ctx.strokeStyle = regionColor + "30";
       ctx.lineWidth = 2;
 
-      // Draw region boundary (simplified)
-      const regionLocations = region.locations
-        .map(locId => getLocationById(locId))
-        .filter(Boolean) as MapLocation[];
+      const screenMinX = region.bounds.minX * zoom + pan.x;
+      const screenMaxX = region.bounds.maxX * zoom + pan.x;
+      const screenMinY = region.bounds.minY * zoom + pan.y;
+      const screenMaxY = region.bounds.maxY * zoom + pan.y;
 
-      if (regionLocations.length > 0) {
-        const minX = Math.min(...regionLocations.map(l => l.x)) - 15;
-        const maxX = Math.max(...regionLocations.map(l => l.x)) + 15;
-        const minY = Math.min(...regionLocations.map(l => l.y)) - 15;
-        const maxY = Math.max(...regionLocations.map(l => l.y)) + 15;
+      ctx.fillRect(screenMinX, screenMinY, screenMaxX - screenMinX, screenMaxY - screenMinY);
+      ctx.strokeRect(screenMinX, screenMinY, screenMaxX - screenMinX, screenMaxY - screenMinY);
 
-        const screenMinX = minX * zoom + pan.x;
-        const screenMaxX = maxX * zoom + pan.x;
-        const screenMinY = minY * zoom + pan.y;
-        const screenMaxY = maxY * zoom + pan.y;
-
-        ctx.fillRect(screenMinX, screenMinY, screenMaxX - screenMinX, screenMaxY - screenMinY);
-        ctx.strokeRect(screenMinX, screenMinY, screenMaxX - screenMinX, screenMaxY - screenMinY);
-
-        // Draw region label
-        ctx.fillStyle = regionColor + "60";
-        ctx.font = "bold 14px serif";
-        ctx.textAlign = "center";
-        ctx.fillText(region.name, (screenMinX + screenMaxX) / 2, screenMinY - 10);
-      }
+      // Draw region label
+      ctx.fillStyle = regionColor + "80";
+      ctx.font = "bold 12px serif";
+      ctx.textAlign = "center";
+      ctx.fillText(region.name, (screenMinX + screenMaxX) / 2, screenMinY + 20);
     });
 
     // Draw locations
@@ -232,8 +220,8 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
   };
 
   const resetView = () => {
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
+    setZoom(2);
+    setPan({ x: 50, y: 50 });
     setSelectedLocation(null);
   };
 
