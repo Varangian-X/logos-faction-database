@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { mapLocations, mapRegions, getLocationById, MapLocation } from "@/lib/mapData";
+import { mapLocations, mapRegions, tradeRoutes, getLocationById, MapLocation } from "@/lib/mapData";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -30,6 +30,10 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    let animationFrameId: number;
+
+    const render = () => {
+
     const width = canvas.width;
     const height = canvas.height;
 
@@ -53,6 +57,45 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
       ctx.lineTo(width, y);
       ctx.stroke();
     }
+
+    // Draw trade routes
+    const time = Date.now() / 1000;
+    tradeRoutes.forEach(route => {
+      const source = getLocationById(route.source);
+      const target = getLocationById(route.target);
+      
+      if (source && target) {
+        const sourceX = source.x * zoom + pan.x;
+        const sourceY = source.y * zoom + pan.y;
+        const targetX = target.x * zoom + pan.x;
+        const targetY = target.y * zoom + pan.y;
+
+        // Draw route line
+        ctx.beginPath();
+        ctx.moveTo(sourceX, sourceY);
+        ctx.lineTo(targetX, targetY);
+        ctx.strokeStyle = route.color + "20"; // Low opacity base line
+        ctx.lineWidth = route.intensity === "high" ? 2 : 1;
+        ctx.setLineDash([]);
+        ctx.stroke();
+
+        // Draw animated particles
+        const distance = Math.sqrt(Math.pow(targetX - sourceX, 2) + Math.pow(targetY - sourceY, 2));
+        const particleCount = Math.max(1, Math.floor(distance / 50));
+        const speed = route.intensity === "high" ? 1.5 : route.intensity === "medium" ? 1 : 0.5;
+        
+        for (let i = 0; i < particleCount; i++) {
+          const offset = (time * speed + i / particleCount) % 1;
+          const particleX = sourceX + (targetX - sourceX) * offset;
+          const particleY = sourceY + (targetY - sourceY) * offset;
+
+          ctx.beginPath();
+          ctx.arc(particleX, particleY, 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = route.color;
+          ctx.fill();
+        }
+      }
+    });
 
     // Draw regions as background areas using bounds
     mapRegions.forEach(region => {
@@ -144,6 +187,15 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
         ctx.fillText(location.name, screenX, screenY - nodeSize - 15);
       }
     });
+    
+    animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
   }, [zoom, pan, selectedLocation, hoveredLocation]);
 
   // Handle mouse events

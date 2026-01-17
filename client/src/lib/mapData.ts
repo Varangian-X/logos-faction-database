@@ -25,6 +25,16 @@ export interface MapRegion {
   bounds: { minX: number; maxX: number; minY: number; maxY: number };
 }
 
+export interface TradeRoute {
+  id: string;
+  source: string;
+  target: string;
+  type: "resource" | "military" | "data" | "contraband";
+  resource: string;
+  intensity: "high" | "medium" | "low";
+  color: string;
+}
+
 export const mapLocations: MapLocation[] = [
   // CORE SYSTEMS (Thracian Core Worlds) - Left/Center cluster
   {
@@ -312,6 +322,106 @@ export const mapRegions: MapRegion[] = [
     dominantAlignment: "Neutral",
     color: "#9D4EDD",
     bounds: { minX: 0, maxX: 100, minY: 0, maxY: 100 },
+  },
+];
+
+export const tradeRoutes: TradeRoute[] = [
+  // Core Systems Internal
+  {
+    id: "route-core-1",
+    source: "antioch-prime",
+    target: "new-byzantium",
+    type: "military",
+    resource: "Weapons & Ships",
+    intensity: "high",
+    color: "#D4AF37",
+  },
+  {
+    id: "route-core-2",
+    source: "nicaea",
+    target: "new-byzantium",
+    type: "data",
+    resource: "Code & Law",
+    intensity: "high",
+    color: "#00E5FF",
+  },
+  {
+    id: "route-core-3",
+    source: "thessalonica",
+    target: "new-byzantium",
+    type: "resource",
+    resource: "Luxury Goods",
+    intensity: "medium",
+    color: "#FF6B35",
+  },
+
+  // Core to Frontier
+  {
+    id: "route-frontier-1",
+    source: "antioch-prime",
+    target: "carnuntum",
+    type: "military",
+    resource: "Reinforcements",
+    intensity: "high",
+    color: "#FF3333",
+  },
+  {
+    id: "route-frontier-2",
+    source: "sarmizegetusa",
+    target: "antioch-prime",
+    type: "resource",
+    resource: "Aurum Crystals",
+    intensity: "high",
+    color: "#D4AF37",
+  },
+
+  // Frontier Internal
+  {
+    id: "route-rim-1",
+    source: "ravenna-echo",
+    target: "carnuntum",
+    type: "military",
+    resource: "Shock Troops",
+    intensity: "high",
+    color: "#FF3333",
+  },
+  {
+    id: "route-rim-2",
+    source: "margus-4",
+    target: "carnuntum",
+    type: "contraband",
+    resource: "Black Market Supplies",
+    intensity: "medium",
+    color: "#9D4EDD",
+  },
+
+  // Border & Anomalous
+  {
+    id: "route-border-1",
+    source: "orakesh-dominion",
+    target: "carnuntum",
+    type: "resource",
+    resource: "Tribute",
+    intensity: "low",
+    color: "#FF6B35",
+  },
+  {
+    id: "route-nebula-1",
+    source: "cherson",
+    target: "new-byzantium",
+    type: "data",
+    resource: "Threat Intelligence",
+    intensity: "medium",
+    color: "#00E5FF",
+  },
+  {
+    id: "route-exile-1",
+    source: "tomi",
+    target: "margus-4",
+    type: "contraband",
+    resource: "Forbidden Data",
+    intensity: "low",
+    color: "#9D4EDD",
   },
 ];
 
