@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { factions, FactionAlignment, FactionTier } from "@/lib/factions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { FactionNetwork } from "@/components/FactionNetwork";
 import { Link } from "wouter";
 import { ArrowLeft } from "lucide-react";
@@ -119,7 +120,8 @@ export default function NetworkPage() {
 
           {/* Selected Faction Details */}
           {selectedFaction && (
-            <div className="flex-1 overflow-auto p-6 space-y-4">
+            <ScrollArea className="flex-1 w-full h-full">
+            <div className="p-6 space-y-4">
               <div>
                 <Badge className={`rounded-sm px-2 py-0.5 text-xs font-bold uppercase ${
                   selectedFaction.alignment === "Stasis" ? "bg-[#D4AF37] text-black" :
@@ -159,6 +161,7 @@ export default function NetworkPage() {
                 </div>
               )}
             </div>
+            </ScrollArea>
           )}
 
           {!selectedFaction && (

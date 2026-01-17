@@ -48,8 +48,8 @@ export default function TimelinePage() {
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden relative z-10">
         {/* Timeline */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <ScrollArea className="flex-1 w-full">
+        <div className="flex-1 flex flex-col overflow-hidden h-full">
+          <ScrollArea className="flex-1 w-full h-full">
             <div className="p-8 space-y-6 pb-20">
               {/* Timeline Introduction */}
               <div className="max-w-3xl mx-auto mb-12">
@@ -200,7 +200,7 @@ export default function TimelinePage() {
               </div>
 
               {/* Content */}
-              <ScrollArea className="flex-1 w-full">
+              <ScrollArea className="flex-1 w-full h-full">
                 <div className="p-6 space-y-6">
                   <div>
                     <h3 className="text-xs font-mono text-[#D4AF37] uppercase mb-3">Overview</h3>
