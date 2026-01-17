@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Network from "./pages/Network";
 import Timeline from "./pages/Timeline";
+import Map from "./pages/Map";
 
 
 function Router() {
@@ -15,6 +16,7 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/network"} component={Network} />
       <Route path={"/timeline"} component={Timeline} />
+      <Route path={"/map"} component={Map} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
