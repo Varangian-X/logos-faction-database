@@ -232,7 +232,7 @@ export default function Home() {
         
         {/* Sidebar / List View */}
         <div className={cn(
-          "flex flex-col border-r border-white/10 bg-black/40 backdrop-blur-sm transition-all duration-500 ease-in-out",
+          "flex flex-col border-r border-white/10 bg-black/40 backdrop-blur-sm transition-all duration-500 ease-in-out overflow-hidden",
           selectedFactionId ? "w-full md:w-[450px]" : "w-full max-w-5xl mx-auto border-r-0"
         )}>
           
@@ -282,11 +282,12 @@ export default function Home() {
           </div>
 
           {/* List */}
-          <ScrollArea className="flex-1 w-full">
-            <div className={cn(
-              "grid gap-4 pb-20 px-6",
-              selectedFactionId ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-            )}>
+          <div className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full w-full">
+              <div className={cn(
+                "grid gap-4 pb-20 px-6",
+                selectedFactionId ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+              )}>
               <AnimatePresence>
                 {filteredFactions.map((faction) => (
                   <FactionCard 
@@ -303,8 +304,9 @@ export default function Home() {
                   NO RECORDS FOUND IN ARCHIVE
                 </div>
               )}
-            </div>
-          </ScrollArea>
+              </div>
+            </ScrollArea>
+          </div>
         </div>
 
         {/* Detail View (Desktop) */}
