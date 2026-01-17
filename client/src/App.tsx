@@ -11,7 +11,7 @@ import Network from "./pages/Network";
 function Router() {
   return (
     <Switch>
-      <Route path={"\t/"} component={Home} />
+      <Route path={"/"} component={Home} />
       <Route path={"/network"} component={Network} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
