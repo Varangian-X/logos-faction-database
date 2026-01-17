@@ -216,7 +216,7 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
   const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
     e.preventDefault();
     const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-    setZoom(Math.max(0.5, Math.min(3, zoom * zoomFactor)));
+    setZoom(Math.max(0.5, Math.min(6, zoom * zoomFactor)));
   };
 
   const resetView = () => {
@@ -245,7 +245,7 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
         <Button
           variant="outline"
           size="icon"
-          onClick={() => setZoom(Math.min(3, zoom * 1.2))}
+          onClick={() => setZoom(Math.min(6, zoom * 1.2))}
           className="bg-black/60 border-white/20 hover:bg-black/80"
           title="Zoom In"
         >
