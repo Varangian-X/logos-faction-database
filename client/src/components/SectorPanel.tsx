@@ -1,18 +1,20 @@
 import React, { useState } from "react";
-import { MapRegion, MapLocation, mapLocations, mapRegions } from "@/lib/mapData";
+import { MapLocation, MapRegion, mapLocations } from "@/lib/mapData";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ChevronDown, ChevronUp, Zap, Shield, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { ScenarioGenerator } from "./ScenarioGenerator";
 
 interface SectorPanelProps {
   region: MapRegion;
   onLocationSelect?: (location: MapLocation) => void;
+  currentYear?: number;
 }
 
-export const SectorPanel: React.FC<SectorPanelProps> = ({ region, onLocationSelect }) => {
+export const SectorPanel: React.FC<SectorPanelProps> = ({ region, onLocationSelect, currentYear = 30492 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<MapLocation | null>(null);
 
@@ -212,6 +214,11 @@ export const SectorPanel: React.FC<SectorPanelProps> = ({ region, onLocationSele
                     ))}
                   </div>
                 </div>
+              )}
+
+              {/* Scenario Generator */}
+              {selectedLocation && (
+                <ScenarioGenerator location={selectedLocation} year={currentYear} />
               )}
             </div>
           </motion.div>

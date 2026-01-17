@@ -5,9 +5,10 @@ import { SectorPanel } from "@/components/SectorPanel";
 
 interface SectorOverviewProps {
   onLocationSelect?: (location: MapLocation) => void;
+  currentYear?: number;
 }
 
-export const SectorOverview: React.FC<SectorOverviewProps> = ({ onLocationSelect }) => {
+export const SectorOverview: React.FC<SectorOverviewProps> = ({ onLocationSelect, currentYear = 30492 }) => {
   return (
     <div className="w-full h-full flex flex-col bg-[#050505] border-l border-white/10 overflow-hidden">
       {/* Header */}
@@ -24,6 +25,7 @@ export const SectorOverview: React.FC<SectorOverviewProps> = ({ onLocationSelect
               key={region.id}
               region={region}
               onLocationSelect={onLocationSelect}
+              currentYear={currentYear}
             />
           ))}
         </div>

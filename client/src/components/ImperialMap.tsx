@@ -11,9 +11,15 @@ import { TimeLapseControl } from "./TimeLapseControl";
 
 interface ImperialMapProps {
   onLocationSelect?: (location: MapLocation) => void;
+  currentYear?: number;
+  onYearChange?: (year: number) => void;
 }
 
-export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) => {
+export const ImperialMap: React.FC<ImperialMapProps> = ({ 
+  onLocationSelect, 
+  currentYear: propCurrentYear, 
+  onYearChange 
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedLocation, setSelectedLocation] = useState<MapLocation | null>(null);
@@ -27,7 +33,10 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   
   // Time-lapse state
-  const [currentYear, setCurrentYear] = useState(30492);
+  const [internalCurrentYear, setInternalCurrentYear] = useState(30492);
+  const currentYear = propCurrentYear ?? internalCurrentYear;
+  const setCurrentYear = onYearChange ?? setInternalCurrentYear;
+  
   const [isPlaying, setIsPlaying] = useState(false);
   const [showTimeLapse, setShowTimeLapse] = useState(false);
   const [showStrengthOverlay, setShowStrengthOverlay] = useState(false);
@@ -37,13 +46,20 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
     let interval: NodeJS.Timeout;
     if (isPlaying) {
       interval = setInterval(() => {
-        setCurrentYear(prev => {
-          if (prev >= 30492) {
-            setIsPlaying(false);
-            return 30492;
-          }
-          return prev + 1;
-        });
+        // Handle both state setter and direct callback patterns
+        if (onYearChange) {
+          const nextYear = currentYear >= 30492 ? 30492 : currentYear + 1;
+          if (nextYear === 30492) setIsPlaying(false);
+          onYearChange(nextYear);
+        } else {
+          setInternalCurrentYear(prev => {
+            if (prev >= 30492) {
+              setIsPlaying(false);
+              return 30492;
+            }
+            return prev + 1;
+          });
+        }
       }, 200); // 5 years per second
     }
     return () => clearInterval(interval);

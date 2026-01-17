@@ -9,6 +9,7 @@ import { MapLocation } from "@/lib/mapData";
 export default function MapPage() {
   const [selectedLocation, setSelectedLocation] = useState<MapLocation | null>(null);
   const [showSectorPanel, setShowSectorPanel] = useState(false);
+  const [currentYear, setCurrentYear] = useState(30492);
 
   return (
     <div className="h-screen w-full bg-[#050505] text-white overflow-hidden flex flex-col font-sans">
@@ -36,7 +37,11 @@ export default function MapPage() {
       <div className="flex-1 flex overflow-hidden relative z-10">
         {/* Map */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          <ImperialMap onLocationSelect={setSelectedLocation} />
+          <ImperialMap 
+            onLocationSelect={setSelectedLocation} 
+            currentYear={currentYear}
+            onYearChange={setCurrentYear}
+          />
           
           {/* Toggle Sector Panel Button */}
           <button
@@ -55,7 +60,10 @@ export default function MapPage() {
         {/* Sector Overview Panel */}
         {showSectorPanel && (
           <div className="w-80 border-l border-white/10 overflow-hidden h-full flex flex-col">
-            <SectorOverview onLocationSelect={setSelectedLocation} />
+            <SectorOverview 
+              onLocationSelect={setSelectedLocation} 
+              currentYear={currentYear}
+            />
           </div>
         )}
       </div>
