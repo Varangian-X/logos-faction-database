@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Search, Filter, Shield, Zap, Database, Globe, Skull, Users, Cpu, Activity } from "lucide-react";
+import { Search, Shield, Skull, Download, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { useFactionNavigation, exportFactionToPDF } from "@/hooks/useFactionNavigation";
 
 // --- Components ---
 
@@ -59,7 +60,7 @@ const FactionCard = ({ faction, onClick, isSelected }: { faction: Faction; onCli
   );
 };
 
-const DetailPanel = ({ faction, onClose }: { faction: Faction; onClose: () => void }) => {
+const DetailPanel = ({ faction, onClose, onExport }: { faction: Faction; onClose: () => void; onExport: () => void }) => {
   if (!faction) return null;
 
   return (
@@ -81,19 +82,30 @@ const DetailPanel = ({ faction, onClose }: { faction: Faction; onClose: () => vo
           alt={faction.name}
           className="w-full h-full object-cover opacity-80"
         />
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={onClose}
-          className="absolute top-4 right-4 z-20 text-white/70 hover:text-white hover:bg-black/50"
-        >
-          <span className="sr-only">Close</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-        </Button>
+        <div className="absolute top-4 right-4 z-20 flex gap-2">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onExport}
+            className="text-white/70 hover:text-white hover:bg-black/50"
+            title="Export to HTML"
+          >
+            <Download className="w-4 h-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose}
+            className="text-white/70 hover:text-white hover:bg-black/50"
+            title="Close"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </Button>
+        </div>
       </div>
 
-      <ScrollArea className="flex-1 px-6 py-4 relative z-10">
-        <div className="space-y-6 pb-10">
+      <ScrollArea className="flex-1 w-full">
+        <div className="space-y-6 pb-10 px-6 py-4 relative z-10">
           {/* Title Section */}
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -119,7 +131,7 @@ const DetailPanel = ({ faction, onClose }: { faction: Faction; onClose: () => vo
           {/* Key Details */}
           <div>
             <h3 className="text-sm font-mono text-[#D4AF37] uppercase mb-3 flex items-center gap-2">
-              <Database className="w-4 h-4" /> System Data
+              <FileText className="w-4 h-4" /> System Data
             </h3>
             <div className="grid grid-cols-1 gap-2">
               {faction.keyDetails.map((detail, i) => (
@@ -197,6 +209,15 @@ export default function Home() {
     factions.find(f => f.id === selectedFactionId), 
   [selectedFactionId]);
 
+  // Keyboard navigation hook
+  useFactionNavigation(filteredFactions, selectedFactionId, setSelectedFactionId);
+
+  const handleExport = () => {
+    if (selectedFaction) {
+      exportFactionToPDF(selectedFaction);
+    }
+  };
+
   return (
     <div className="h-screen w-full bg-[#050505] text-white overflow-hidden flex flex-col font-sans selection:bg-[#D4AF37] selection:text-black">
       {/* Background Elements */}
@@ -223,7 +244,7 @@ export default function Home() {
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             <span>SYSTEM ONLINE</span>
           </div>
-          <div>Cycle: 30,492 AD</div>
+          <div>Factions: {factions.length} // Cycle: 30,492 AD</div>
         </div>
       </header>
 
@@ -273,6 +294,7 @@ export default function Home() {
                 <option value="4">Tier 4 (Frontier)</option>
                 <option value="5">Tier 5 (Underworld)</option>
                 <option value="6">Tier 6 (Xenos)</option>
+                <option value="7">Tier 7 (Emergent)</option>
               </select>
               
               <div className="ml-auto text-xs font-mono text-white/30 self-center">
@@ -288,22 +310,22 @@ export default function Home() {
                 "grid gap-4 pb-20 px-6",
                 selectedFactionId ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
               )}>
-              <AnimatePresence>
-                {filteredFactions.map((faction) => (
-                  <FactionCard 
-                    key={faction.id} 
-                    faction={faction} 
-                    isSelected={selectedFactionId === faction.id}
-                    onClick={() => setSelectedFactionId(faction.id)}
-                  />
-                ))}
-              </AnimatePresence>
-              
-              {filteredFactions.length === 0 && (
-                <div className="col-span-full text-center py-20 text-white/30 font-mono">
-                  NO RECORDS FOUND IN ARCHIVE
-                </div>
-              )}
+                <AnimatePresence>
+                  {filteredFactions.map((faction) => (
+                    <FactionCard 
+                      key={faction.id} 
+                      faction={faction} 
+                      isSelected={selectedFactionId === faction.id}
+                      onClick={() => setSelectedFactionId(faction.id)}
+                    />
+                  ))}
+                </AnimatePresence>
+                
+                {filteredFactions.length === 0 && (
+                  <div className="col-span-full text-center py-20 text-white/30 font-mono">
+                    NO RECORDS FOUND IN ARCHIVE
+                  </div>
+                )}
               </div>
             </ScrollArea>
           </div>
@@ -315,7 +337,8 @@ export default function Home() {
             <div className="hidden md:block flex-1 h-full relative z-20 shadow-2xl">
               <DetailPanel 
                 faction={selectedFaction!} 
-                onClose={() => setSelectedFactionId(null)} 
+                onClose={() => setSelectedFactionId(null)}
+                onExport={handleExport}
               />
             </div>
           )}
@@ -332,12 +355,18 @@ export default function Home() {
             >
               <DetailPanel 
                 faction={selectedFaction!} 
-                onClose={() => setSelectedFactionId(null)} 
+                onClose={() => setSelectedFactionId(null)}
+                onExport={handleExport}
               />
             </motion.div>
           )}
         </AnimatePresence>
 
+      </div>
+
+      {/* Keyboard Help Hint */}
+      <div className="fixed bottom-4 right-4 z-30 text-xs font-mono text-white/30 bg-black/60 px-3 py-2 rounded border border-white/10 hidden lg:block">
+        ↑↓ Navigate • ⏠⏡ Select • ⌘+E Export
       </div>
     </div>
   );
