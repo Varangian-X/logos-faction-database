@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "wouter";
+import { ScenarioGenerator } from "@/components/ScenarioGenerator";
+import { mapLocations } from "@/lib/mapData";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -200,7 +202,7 @@ export default function TimelinePage() {
               </div>
 
               {/* Content */}
-              <ScrollArea className="flex-1 w-full h-full">
+              <div className="flex-1 w-full h-full overflow-y-auto custom-scrollbar">
                 <div className="p-6 space-y-6">
                   <div>
                     <h3 className="text-xs font-mono text-[#D4AF37] uppercase mb-3">Overview</h3>
@@ -221,7 +223,7 @@ export default function TimelinePage() {
                     </div>
                   </div>
 
-                  {(selectedFaction.allies || selectedFaction.enemies) && (
+                          {(selectedFaction.allies || selectedFaction.enemies) && (
                     <>
                       <Separator className="bg-white/10" />
                       <div className="grid grid-cols-2 gap-4">
@@ -229,8 +231,8 @@ export default function TimelinePage() {
                           <div>
                             <h4 className="text-xs font-mono text-green-400 uppercase mb-2">Allies</h4>
                             <ul className="text-xs text-white/70 space-y-1">
-                              {selectedFaction.allies.map(a => (
-                                <li key={a}>• {a}</li>
+                              {selectedFaction.allies.map(ally => (
+                                <li key={ally}>• {ally}</li>
                               ))}
                             </ul>
                           </div>
@@ -239,8 +241,8 @@ export default function TimelinePage() {
                           <div>
                             <h4 className="text-xs font-mono text-red-400 uppercase mb-2">Enemies</h4>
                             <ul className="text-xs text-white/70 space-y-1">
-                              {selectedFaction.enemies.map(e => (
-                                <li key={e}>• {e}</li>
+                              {selectedFaction.enemies.map(enemy => (
+                                <li key={enemy}>• {enemy}</li>
                               ))}
                             </ul>
                           </div>
@@ -249,8 +251,30 @@ export default function TimelinePage() {
                     </>
                   )}
 
+                  {/* Scenario Generator for Faction */}
                   <Separator className="bg-white/10" />
+                  <div>
+                    <h3 className="text-xs font-mono text-[#D4AF37] uppercase mb-3">Generate Faction Event</h3>
+                    <ScenarioGenerator 
+                      location={{
+                        id: "faction-event",
+                        name: selectedFaction.name,
+                        x: 0, y: 0,
+                        type: "core",
+                        alignment: selectedFaction.alignment === "Existential" ? "Anomalous" : selectedFaction.alignment,
+                        controllingFaction: selectedFaction.name,
+                        description: selectedFaction.description,
+                        strategicValue: "critical",
+                        resources: [],
+                        threats: selectedFaction.enemies || [],
+                        zone: "core-systems",
+                        population: "Unknown"
+                      }} 
+                      year={30492}
+                    />
+                  </div>
 
+                  <Separator className="bg-white/10" />
                   <div>
                     <h3 className="text-xs font-mono text-white/40 uppercase mb-2">Sources</h3>
                     <div className="flex flex-wrap gap-2">
@@ -262,7 +286,7 @@ export default function TimelinePage() {
                     </div>
                   </div>
                 </div>
-              </ScrollArea>
+              </div>
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center text-white/30 font-mono text-sm p-4 text-center">

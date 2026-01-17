@@ -120,7 +120,7 @@ export default function NetworkPage() {
 
           {/* Selected Faction Details */}
           {selectedFaction && (
-            <ScrollArea className="flex-1 w-full h-full">
+            <div className="flex-1 w-full h-full overflow-y-auto custom-scrollbar">
             <div className="p-6 space-y-4">
               <div>
                 <Badge className={`rounded-sm px-2 py-0.5 text-xs font-bold uppercase ${
@@ -161,7 +161,7 @@ export default function NetworkPage() {
                 </div>
               )}
             </div>
-            </ScrollArea>
+            </div>
           )}
 
           {!selectedFaction && (
