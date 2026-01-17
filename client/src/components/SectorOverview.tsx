@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { mapRegions } from "@/lib/mapData";
 import { MapLocation } from "@/lib/mapData";
 import { SectorPanel } from "@/components/SectorPanel";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface SectorOverviewProps {
   onLocationSelect?: (location: MapLocation) => void;
@@ -18,8 +17,8 @@ export const SectorOverview: React.FC<SectorOverviewProps> = ({ onLocationSelect
       </div>
 
       {/* Sector Panels */}
-      <ScrollArea className="flex-1 w-full">
-        <div className="p-4 space-y-3 pr-4">
+      <div className="flex-1 w-full overflow-y-auto custom-scrollbar">
+        <div className="p-4 space-y-3">
           {mapRegions.map(region => (
             <SectorPanel
               key={region.id}
@@ -28,7 +27,7 @@ export const SectorOverview: React.FC<SectorOverviewProps> = ({ onLocationSelect
             />
           ))}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 };
