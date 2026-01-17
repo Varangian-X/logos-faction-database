@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { mapLocations, mapRegions, tradeRoutes, getLocationById, MapLocation } from "@/lib/mapData";
+import { mapLocations, mapRegions, tradeRoutes, getLocationById, MapLocation, TradeRoute } from "@/lib/mapData";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -16,11 +16,14 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedLocation, setSelectedLocation] = useState<MapLocation | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState<TradeRoute | null>(null);
   const [zoom, setZoom] = useState(2);
   const [pan, setPan] = useState({ x: 50, y: 50 });
   const [hoveredLocation, setHoveredLocation] = useState<string | null>(null);
+  const [hoveredRoute, setHoveredRoute] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   // Render the map
   useEffect(() => {
@@ -71,11 +74,14 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
         const targetY = target.y * zoom + pan.y;
 
         // Draw route line
+        const isRouteHovered = hoveredRoute === route.id;
+        const isRouteSelected = selectedRoute?.id === route.id;
+        
         ctx.beginPath();
         ctx.moveTo(sourceX, sourceY);
         ctx.lineTo(targetX, targetY);
-        ctx.strokeStyle = route.color + "20"; // Low opacity base line
-        ctx.lineWidth = route.intensity === "high" ? 2 : 1;
+        ctx.strokeStyle = isRouteHovered || isRouteSelected ? route.color + "80" : route.color + "20";
+        ctx.lineWidth = isRouteHovered || isRouteSelected ? 3 : (route.intensity === "high" ? 2 : 1);
         ctx.setLineDash([]);
         ctx.stroke();
 
@@ -216,6 +222,8 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
       return;
     }
 
+    setMousePos({ x: e.clientX, y: e.clientY });
+
     // Check if hovering over a location
     let foundLocation: string | null = null;
     for (const location of mapLocations) {
@@ -230,8 +238,55 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
       }
     }
 
+    // Check if hovering over a trade route
+    let foundRoute: string | null = null;
+    if (!foundLocation) {
+      for (const route of tradeRoutes) {
+        const source = getLocationById(route.source);
+        const target = getLocationById(route.target);
+        if (source && target) {
+          const x1 = source.x * zoom + pan.x;
+          const y1 = source.y * zoom + pan.y;
+          const x2 = target.x * zoom + pan.x;
+          const y2 = target.y * zoom + pan.y;
+          
+          // Calculate distance from point to line segment
+          const A = x - x1;
+          const B = y - y1;
+          const C = x2 - x1;
+          const D = y2 - y1;
+          const dot = A * C + B * D;
+          const lenSq = C * C + D * D;
+          let param = -1;
+          if (lenSq !== 0) param = dot / lenSq;
+          
+          let xx, yy;
+          if (param < 0) {
+            xx = x1;
+            yy = y1;
+          } else if (param > 1) {
+            xx = x2;
+            yy = y2;
+          } else {
+            xx = x1 + param * C;
+            yy = y1 + param * D;
+          }
+          
+          const dx = x - xx;
+          const dy = y - yy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < 5) {
+            foundRoute = route.id;
+            break;
+          }
+        }
+      }
+    }
+
     setHoveredLocation(foundLocation);
-    canvas.style.cursor = foundLocation ? "pointer" : "grab";
+    setHoveredRoute(foundRoute);
+    canvas.style.cursor = foundLocation || foundRoute ? "pointer" : "grab";
   };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -251,7 +306,18 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
       const distance = Math.sqrt(dx * dx + dy * dy);
       if (distance < 15 * zoom) {
         setSelectedLocation(location);
+        setSelectedRoute(null);
         onLocationSelect?.(location);
+        return;
+      }
+    }
+
+    // Check if clicking on a trade route
+    if (hoveredRoute) {
+      const route = tradeRoutes.find(r => r.id === hoveredRoute);
+      if (route) {
+        setSelectedRoute(route);
+        setSelectedLocation(null);
         return;
       }
     }
@@ -259,6 +325,7 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
     // Start dragging
     setIsDragging(true);
     setDragStart({ x, y });
+    setSelectedRoute(null);
   };
 
   const handleMouseUp = () => {
@@ -322,6 +389,57 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
           <RotateCcw className="w-4 h-4" />
         </Button>
       </div>
+
+      {/* Trade Route Tooltip */}
+      <AnimatePresence>
+        {hoveredRoute && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="fixed z-50 pointer-events-none"
+            style={{ left: mousePos.x + 15, top: mousePos.y + 15 }}
+          >
+            <div className="bg-black/90 border border-[#D4AF37]/30 p-3 rounded-lg shadow-xl backdrop-blur-md min-w-[200px]">
+              {(() => {
+                const route = tradeRoutes.find(r => r.id === hoveredRoute);
+                if (!route) return null;
+                const source = getLocationById(route.source);
+                const target = getLocationById(route.target);
+                return (
+                  <>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider">Trade Route</span>
+                      <Badge variant="outline" className="text-[10px] h-4 border-white/20" style={{ color: route.color }}>
+                        {route.type.toUpperCase()}
+                      </Badge>
+                    </div>
+                    <div className="space-y-1 text-xs text-white/80">
+                      <div className="flex justify-between">
+                        <span className="text-white/50">Resource:</span>
+                        <span className="font-mono">{route.resource}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-white/50">Flow:</span>
+                        <span>{source?.name.split(' ')[0]} → {target?.name.split(' ')[0]}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-white/50">Intensity:</span>
+                        <span className={cn(
+                          route.intensity === "high" ? "text-red-400" : 
+                          route.intensity === "medium" ? "text-yellow-400" : "text-blue-400"
+                        )}>
+                          {route.intensity.toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Legend */}
       <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm border border-white/10 rounded p-3 text-xs font-mono text-white/70 space-y-1 z-20">
