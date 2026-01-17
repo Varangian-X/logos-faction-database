@@ -282,9 +282,9 @@ export default function Home() {
           </div>
 
           {/* List */}
-          <ScrollArea className="flex-1 px-6 pb-6">
+          <ScrollArea className="flex-1 w-full">
             <div className={cn(
-              "grid gap-4 pb-20",
+              "grid gap-4 pb-20 px-6",
               selectedFactionId ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
             )}>
               <AnimatePresence>
