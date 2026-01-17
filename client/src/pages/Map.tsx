@@ -54,7 +54,7 @@ export default function MapPage() {
 
         {/* Sector Overview Panel */}
         {showSectorPanel && (
-          <div className="w-80 border-l border-white/10 overflow-hidden">
+          <div className="w-80 border-l border-white/10 overflow-hidden h-full flex flex-col">
             <SectorOverview onLocationSelect={setSelectedLocation} />
           </div>
         )}
