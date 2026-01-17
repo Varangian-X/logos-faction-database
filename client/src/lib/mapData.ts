@@ -12,6 +12,13 @@ export interface MapLocation {
   population: string;
   threats: string[];
   alignment: "Stasis" | "Plasticity" | "Neutral" | "Anomalous";
+  history?: {
+    [year: number]: {
+      controllingFaction: string;
+      alignment: "Stasis" | "Plasticity" | "Neutral" | "Anomalous";
+      strength: number; // 0-100
+    };
+  };
 }
 
 export interface MapRegion {
@@ -33,6 +40,12 @@ export interface TradeRoute {
   resource: string;
   intensity: "high" | "medium" | "low";
   color: string;
+  history?: {
+    [year: number]: {
+      active: boolean;
+      intensity: "high" | "medium" | "low";
+    };
+  };
 }
 
 export const mapLocations: MapLocation[] = [
@@ -51,6 +64,11 @@ export const mapLocations: MapLocation[] = [
     population: "Billions (stratified by altitude)",
     threats: ["Internal decay", "Political schism", "Bureaucratic collapse"],
     alignment: "Stasis",
+    history: {
+      30400: { controllingFaction: "Digital Divine Emperor", alignment: "Stasis", strength: 100 },
+      30450: { controllingFaction: "Digital Divine Emperor", alignment: "Stasis", strength: 95 },
+      30492: { controllingFaction: "Digital Divine Emperor", alignment: "Stasis", strength: 90 },
+    },
   },
   {
     id: "nicaea",
@@ -128,6 +146,11 @@ export const mapLocations: MapLocation[] = [
     population: "Millions (military personnel)",
     threats: ["Leadership conflict", "Void-Hun raids", "Supply disruption"],
     alignment: "Plasticity",
+    history: {
+      30400: { controllingFaction: "Neo-Praetorians", alignment: "Stasis", strength: 80 },
+      30450: { controllingFaction: "Neo-Praetorians", alignment: "Stasis", strength: 60 },
+      30492: { controllingFaction: "Neo-Praetorians / Neo-Varangians (contested)", alignment: "Plasticity", strength: 50 },
+    },
   },
   {
     id: "margus-4",
@@ -143,6 +166,11 @@ export const mapLocations: MapLocation[] = [
     population: "Millions (criminals, smugglers, merchants)",
     threats: ["Criminal uprising", "Scrinium Barbarorum manipulation", "Economic collapse"],
     alignment: "Plasticity",
+    history: {
+      30400: { controllingFaction: "Imperial Navy", alignment: "Stasis", strength: 70 },
+      30450: { controllingFaction: "Council of Captains", alignment: "Plasticity", strength: 60 },
+      30492: { controllingFaction: "Council of Captains", alignment: "Plasticity", strength: 85 },
+    },
   },
   {
     id: "ravenna-echo",

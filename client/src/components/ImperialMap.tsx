@@ -6,7 +6,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { ZoomIn, ZoomOut, RotateCcw, Clock, Activity } from "lucide-react";
+import { TimeLapseControl } from "./TimeLapseControl";
 
 interface ImperialMapProps {
   onLocationSelect?: (location: MapLocation) => void;
@@ -24,6 +25,29 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  
+  // Time-lapse state
+  const [currentYear, setCurrentYear] = useState(30492);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showTimeLapse, setShowTimeLapse] = useState(false);
+  const [showStrengthOverlay, setShowStrengthOverlay] = useState(false);
+
+  // Time-lapse animation loop
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isPlaying) {
+      interval = setInterval(() => {
+        setCurrentYear(prev => {
+          if (prev >= 30492) {
+            setIsPlaying(false);
+            return 30492;
+          }
+          return prev + 1;
+        });
+      }, 200); // 5 years per second
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying]);
 
   // Render the map
   useEffect(() => {
@@ -64,6 +88,27 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
     // Draw trade routes
     const time = Date.now() / 1000;
     tradeRoutes.forEach(route => {
+      // Check historical status
+      let isActive = true;
+      let intensity = route.intensity;
+      
+      if (showTimeLapse && route.history) {
+        // Find closest historical record
+        const years = Object.keys(route.history).map(Number).sort((a, b) => a - b);
+        let record = null;
+        for (const year of years) {
+          if (year <= currentYear) {
+            record = route.history[year];
+          }
+        }
+        if (record) {
+          isActive = record.active;
+          intensity = record.intensity;
+        }
+      }
+
+      if (!isActive) return;
+
       const source = getLocationById(route.source);
       const target = getLocationById(route.target);
       
@@ -81,14 +126,14 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
         ctx.moveTo(sourceX, sourceY);
         ctx.lineTo(targetX, targetY);
         ctx.strokeStyle = isRouteHovered || isRouteSelected ? route.color + "80" : route.color + "20";
-        ctx.lineWidth = isRouteHovered || isRouteSelected ? 3 : (route.intensity === "high" ? 2 : 1);
+        ctx.lineWidth = isRouteHovered || isRouteSelected ? 3 : (intensity === "high" ? 2 : 1);
         ctx.setLineDash([]);
         ctx.stroke();
 
         // Draw animated particles
         const distance = Math.sqrt(Math.pow(targetX - sourceX, 2) + Math.pow(targetY - sourceY, 2));
         const particleCount = Math.max(1, Math.floor(distance / 50));
-        const speed = route.intensity === "high" ? 1.5 : route.intensity === "medium" ? 1 : 0.5;
+        const speed = intensity === "high" ? 1.5 : intensity === "medium" ? 1 : 0.5;
         
         for (let i = 0; i < particleCount; i++) {
           const offset = (time * speed + i / particleCount) % 1;
@@ -156,17 +201,55 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
         ctx.setLineDash([]);
       }
 
+      // Determine historical state
+      let alignment = location.alignment;
+      let strength = 100;
+      
+      if (showTimeLapse && location.history) {
+        const years = Object.keys(location.history).map(Number).sort((a, b) => a - b);
+        let record = null;
+        for (const year of years) {
+          if (year <= currentYear) {
+            record = location.history[year];
+          }
+        }
+        if (record) {
+          alignment = record.alignment;
+          strength = record.strength;
+        }
+      }
+
       // Draw location node
       const nodeColor =
-        location.alignment === "Stasis"
+        alignment === "Stasis"
           ? "#D4AF37"
-          : location.alignment === "Plasticity"
+          : alignment === "Plasticity"
             ? "#FF3333"
-            : location.alignment === "Anomalous"
+            : alignment === "Anomalous"
               ? "#00E5FF"
               : "#888888";
 
       const nodeSize = isSelected ? 12 : isHovered ? 10 : 8;
+
+      // Draw strength overlay
+      if (showStrengthOverlay) {
+        const strengthRadius = (strength / 100) * 40;
+        const gradient = ctx.createRadialGradient(screenX, screenY, nodeSize, screenX, screenY, strengthRadius);
+        gradient.addColorStop(0, nodeColor + "40");
+        gradient.addColorStop(1, nodeColor + "00");
+        
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, strengthRadius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw strength ring
+        ctx.strokeStyle = nodeColor + "20";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, strengthRadius, 0, Math.PI * 2);
+        ctx.stroke();
+      }
 
       ctx.fillStyle = nodeColor;
       ctx.globalAlpha = isSelected ? 1 : isHovered ? 0.9 : 0.7;
@@ -202,7 +285,7 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [zoom, pan, selectedLocation, hoveredLocation]);
+  }, [zoom, pan, selectedLocation, hoveredLocation, currentYear, showTimeLapse, showStrengthOverlay]);
 
   // Handle mouse events
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -388,7 +471,50 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({ onLocationSelect }) =>
         >
           <RotateCcw className="w-4 h-4" />
         </Button>
+        <Separator orientation="vertical" className="h-8 bg-white/20" />
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setShowTimeLapse(!showTimeLapse)}
+          className={cn(
+            "bg-black/60 border-white/20 hover:bg-black/80",
+            showTimeLapse && "bg-[#D4AF37]/20 border-[#D4AF37] text-[#D4AF37]"
+          )}
+          title="Toggle Time-Lapse"
+        >
+          <Clock className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setShowStrengthOverlay(!showStrengthOverlay)}
+          className={cn(
+            "bg-black/60 border-white/20 hover:bg-black/80",
+            showStrengthOverlay && "bg-[#D4AF37]/20 border-[#D4AF37] text-[#D4AF37]"
+          )}
+          title="Toggle Strength Overlay"
+        >
+          <Activity className="w-4 h-4" />
+        </Button>
       </div>
+
+      {/* Time Lapse Control */}
+      <AnimatePresence>
+        {showTimeLapse && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+          >
+            <TimeLapseControl
+              currentYear={currentYear}
+              isPlaying={isPlaying}
+              onPlayPause={() => setIsPlaying(!isPlaying)}
+              onYearChange={setCurrentYear}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Trade Route Tooltip */}
       <AnimatePresence>
