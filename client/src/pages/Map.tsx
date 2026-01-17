@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Menu, X } from "lucide-react";
 import { ImperialMap } from "@/components/ImperialMap";
+import { SectorOverview } from "@/components/SectorOverview";
 import { MapLocation } from "@/lib/mapData";
 
 export default function MapPage() {
   const [selectedLocation, setSelectedLocation] = useState<MapLocation | null>(null);
+  const [showSectorPanel, setShowSectorPanel] = useState(false);
 
   return (
     <div className="h-screen w-full bg-[#050505] text-white overflow-hidden flex flex-col font-sans">
@@ -35,7 +37,27 @@ export default function MapPage() {
         {/* Map */}
         <div className="flex-1 flex flex-col overflow-hidden">
           <ImperialMap onLocationSelect={setSelectedLocation} />
+          
+          {/* Toggle Sector Panel Button */}
+          <button
+            onClick={() => setShowSectorPanel(!showSectorPanel)}
+            className="absolute bottom-4 left-4 z-30 p-2 bg-black/60 border border-white/20 rounded hover:bg-black/80 transition-colors"
+            title="Toggle Sector Overview"
+          >
+            {showSectorPanel ? (
+              <X className="w-4 h-4 text-white" />
+            ) : (
+              <Menu className="w-4 h-4 text-white" />
+            )}
+          </button>
         </div>
+
+        {/* Sector Overview Panel */}
+        {showSectorPanel && (
+          <div className="w-80 border-l border-white/10 overflow-hidden">
+            <SectorOverview onLocationSelect={setSelectedLocation} />
+          </div>
+        )}
       </div>
     </div>
   );
