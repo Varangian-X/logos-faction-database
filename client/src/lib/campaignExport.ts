@@ -2,6 +2,61 @@ import { SavedScenario } from "@/contexts/CampaignContext";
 import { jsPDF } from "jspdf";
 import { format } from "date-fns";
 
+interface CampaignEntity {
+  name: string;
+  type: 'faction' | 'npc';
+  role: string;
+  appearances: number;
+}
+
+const extractEntitiesFromScenarios = (scenarios: SavedScenario[]): CampaignEntity[] => {
+  const entities = new Map<string, CampaignEntity>();
+  
+  scenarios.forEach(scenario => {
+    // Add faction
+    const factionKey = `faction-${scenario.faction}`;
+    if (!entities.has(factionKey)) {
+      entities.set(factionKey, {
+        name: scenario.faction,
+        type: 'faction',
+        role: 'Controlling Faction',
+        appearances: 0
+      });
+    }
+    const factionEntity = entities.get(factionKey)!;
+    factionEntity.appearances += 1;
+    
+    // Extract NPCs from description and objectives
+    const textToAnalyze = `${scenario.description} ${scenario.objectives.join(' ')} ${scenario.complications.join(' ')}`;
+    
+    // Simple NPC extraction - look for capitalized names
+    const namePattern = /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*(?:\s+(?:the|of|and)\s+[A-Z][a-z]+)*)/g;
+    const matches = textToAnalyze.match(namePattern) || [];
+    
+    matches.forEach(match => {
+      // Filter out common words and faction names
+      if (!['The', 'A', 'An', 'And', 'Or', 'But', 'In', 'On', 'At', 'To', 'From', 'With', 'By', 'For'].includes(match) &&
+          !scenario.faction.includes(match)) {
+        const npcKey = `npc-${match}`;
+        if (!entities.has(npcKey)) {
+          entities.set(npcKey, {
+            name: match,
+            type: 'npc',
+            role: 'Key NPC',
+            appearances: 0
+          });
+        }
+        const npcEntity = entities.get(npcKey)!;
+        npcEntity.appearances += 1;
+      }
+    });
+  });
+  
+  return Array.from(entities.values())
+    .sort((a, b) => b.appearances - a.appearances)
+    .slice(0, 30); // Limit to top 30 entities
+};
+
 export const exportCampaignToJSON = (scenarios: SavedScenario[]) => {
   const dataStr = JSON.stringify(scenarios, null, 2);
   const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
@@ -20,6 +75,9 @@ export const exportCampaignToPDF = (scenarios: SavedScenario[]) => {
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 20;
   let yPos = margin;
+  
+  // Extract entities for Dramatis Personae
+  const entities = extractEntitiesFromScenarios(scenarios);
 
   // Title Page
   doc.setFillColor(5, 5, 5); // Black background
@@ -40,6 +98,82 @@ export const exportCampaignToPDF = (scenarios: SavedScenario[]) => {
   doc.text(`TOTAL MISSIONS: ${scenarios.length}`, pageWidth / 2, pageHeight / 2 + 28, { align: "center" });
 
   doc.addPage();
+
+  // Dramatis Personae Page
+  doc.setFillColor(5, 5, 5);
+  doc.rect(0, yPos - 10, pageWidth, pageHeight - (yPos - 10), 'F');
+  
+  doc.setTextColor(212, 175, 55);
+  doc.setFont("times", "bold");
+  doc.setFontSize(20);
+  doc.text("DRAMATIS PERSONAE", pageWidth / 2, yPos, { align: "center" });
+  
+  doc.setFontSize(10);
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("courier", "normal");
+  doc.text(`KEY ACTORS IN THIS CAMPAIGN // ${entities.length} ENTITIES IDENTIFIED`, pageWidth / 2, yPos + 10, { align: "center" });
+  
+  yPos += 25;
+  
+  // Factions Section
+  const factions = entities.filter(e => e.type === 'faction');
+  if (factions.length > 0) {
+    doc.setTextColor(212, 175, 55);
+    doc.setFont("times", "bold");
+    doc.setFontSize(12);
+    doc.text("FACTIONS", margin, yPos);
+    yPos += 8;
+    
+    factions.forEach(faction => {
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("times", "normal");
+      doc.setFontSize(10);
+      doc.text(`${faction.name}`, margin + 5, yPos);
+      
+      doc.setFont("courier", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(200, 200, 200);
+      doc.text(`Appearances: ${faction.appearances}`, margin + 80, yPos);
+      
+      yPos += 6;
+      if (yPos > pageHeight - 40) {
+        doc.addPage();
+        yPos = margin;
+      }
+    });
+    yPos += 5;
+  }
+  
+  // NPCs Section
+  const npcs = entities.filter(e => e.type === 'npc');
+  if (npcs.length > 0) {
+    doc.setTextColor(212, 175, 55);
+    doc.setFont("times", "bold");
+    doc.setFontSize(12);
+    doc.text("KEY NPCS & ENTITIES", margin, yPos);
+    yPos += 8;
+    
+    npcs.forEach(npc => {
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("times", "normal");
+      doc.setFontSize(10);
+      doc.text(`${npc.name}`, margin + 5, yPos);
+      
+      doc.setFont("courier", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(200, 200, 200);
+      doc.text(`Appearances: ${npc.appearances}`, margin + 80, yPos);
+      
+      yPos += 6;
+      if (yPos > pageHeight - 40) {
+        doc.addPage();
+        yPos = margin;
+      }
+    });
+  }
+  
+  doc.addPage();
+  yPos = margin;
 
   // Content Pages
   scenarios.forEach((scenario, index) => {
