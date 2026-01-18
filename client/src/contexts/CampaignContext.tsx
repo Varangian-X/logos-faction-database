@@ -24,6 +24,7 @@ interface CampaignContextType {
   updateScenarioNotes: (id: string, notes: string) => void;
   updateScenarioStatus: (id: string, status: 'active' | 'completed' | 'failed') => void;
   clearCampaign: () => void;
+  importCampaign: (scenarios: SavedScenario[], merge: boolean) => void;
   getStatistics: () => {
     total: number;
     active: number;
@@ -78,6 +79,26 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const importCampaign = (scenarios: SavedScenario[], merge: boolean) => {
+    if (merge) {
+      // Merge with existing scenarios - regenerate IDs to avoid conflicts
+      const importedScenarios = scenarios.map(s => ({
+        ...s,
+        id: nanoid(),
+        createdAt: s.createdAt || Date.now(),
+      }));
+      setSavedScenarios(prev => [...importedScenarios, ...prev]);
+    } else {
+      // Replace existing scenarios
+      const importedScenarios = scenarios.map(s => ({
+        ...s,
+        id: nanoid(),
+        createdAt: s.createdAt || Date.now(),
+      }));
+      setSavedScenarios(importedScenarios);
+    }
+  };
+
   const getStatistics = () => {
     const stats = {
       total: savedScenarios.length,
@@ -108,6 +129,7 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
       updateScenarioNotes,
       updateScenarioStatus,
       clearCampaign,
+      importCampaign,
       getStatistics,
     }}>
       {children}
@@ -121,4 +143,22 @@ export function useCampaign() {
     throw new Error('useCampaign must be used within a CampaignProvider');
   }
   return context;
+}
+
+export function validateCampaignJSON(data: unknown): data is SavedScenario[] {
+  if (!Array.isArray(data)) return false;
+  return data.every(item => 
+    typeof item === 'object' &&
+    item !== null &&
+    'id' in item &&
+    'title' in item &&
+    'type' in item &&
+    'description' in item &&
+    'location' in item &&
+    'faction' in item &&
+    'year' in item &&
+    'objectives' in item &&
+    'complications' in item &&
+    'rewards' in item
+  );
 }

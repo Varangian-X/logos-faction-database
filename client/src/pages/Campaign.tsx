@@ -3,15 +3,17 @@ import { useCampaign } from "@/contexts/CampaignContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { ArrowLeft, Trash2, Download, FileJson, BarChart3, List } from "lucide-react";
+import { ArrowLeft, Trash2, Download, FileJson, BarChart3, List, Upload } from "lucide-react";
 import { FileText } from "lucide-react";
 import { exportCampaignToJSON, exportCampaignToPDF } from "@/lib/campaignExport";
 import { CampaignLog } from "@/components/CampaignLog";
 import { CampaignStats } from "@/components/CampaignStats";
+import { CampaignImport } from "@/components/CampaignImport";
 
 export default function CampaignPage() {
   const { savedScenarios, clearCampaign } = useCampaign();
   const [activeTab, setActiveTab] = useState<'log' | 'stats'>('log');
+  const [importOpen, setImportOpen] = useState(false);
 
   return (
     <div className="h-screen w-full bg-[#050505] text-white overflow-hidden flex flex-col font-sans">
@@ -33,41 +35,56 @@ export default function CampaignPage() {
             <p className="text-[10px] font-mono text-white/50 tracking-[0.2em] uppercase">Mission Archive // Active Scenarios</p>
           </div>
         </div>
-        {savedScenarios.length > 0 && (
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => exportCampaignToPDF(savedScenarios)}
-              className="bg-white/5 hover:bg-white/10 text-white border-white/20"
-              title="Export as PDF"
-            >
-              <Download className="w-3 h-3 mr-2" />
-              PDF
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => exportCampaignToJSON(savedScenarios)}
-              className="bg-white/5 hover:bg-white/10 text-white border-white/20"
-              title="Export as JSON"
-            >
-              <FileJson className="w-3 h-3 mr-2" />
-              JSON
-            </Button>
-            <div className="w-px h-8 bg-white/10 mx-2" />
-            <Button 
-              variant="destructive" 
-              size="sm" 
-              onClick={clearCampaign}
-              className="bg-red-900/20 hover:bg-red-900/40 text-red-400 border border-red-900/50"
-            >
-              <Trash2 className="w-3 h-3 mr-2" />
-              Clear Log
-            </Button>
-          </div>
-        )}
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setImportOpen(true)}
+            className="bg-white/5 hover:bg-white/10 text-white border-white/20"
+            title="Import campaign from JSON"
+          >
+            <Upload className="w-3 h-3 mr-2" />
+            Import
+          </Button>
+          {savedScenarios.length > 0 && (
+            <>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => exportCampaignToPDF(savedScenarios)}
+                className="bg-white/5 hover:bg-white/10 text-white border-white/20"
+                title="Export as PDF"
+              >
+                <Download className="w-3 h-3 mr-2" />
+                PDF
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => exportCampaignToJSON(savedScenarios)}
+                className="bg-white/5 hover:bg-white/10 text-white border-white/20"
+                title="Export as JSON"
+              >
+                <FileJson className="w-3 h-3 mr-2" />
+                JSON
+              </Button>
+              <div className="w-px h-8 bg-white/10 mx-2" />
+              <Button 
+                variant="destructive" 
+                size="sm" 
+                onClick={clearCampaign}
+                className="bg-red-900/20 hover:bg-red-900/40 text-red-400 border border-red-900/50"
+              >
+                <Trash2 className="w-3 h-3 mr-2" />
+                Clear Log
+              </Button>
+            </>
+          )}
+        </div>
       </header>
+
+      {/* Import Dialog */}
+      <CampaignImport open={importOpen} onOpenChange={setImportOpen} />
 
       {/* Tabs */}
       {savedScenarios.length > 0 && (
