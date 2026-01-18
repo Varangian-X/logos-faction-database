@@ -3,16 +3,17 @@ import { useCampaign } from "@/contexts/CampaignContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { ArrowLeft, Trash2, Download, FileJson, BarChart3, List, Upload } from "lucide-react";
+import { ArrowLeft, Trash2, Download, FileJson, BarChart3, List, Upload, GitBranch } from "lucide-react";
 import { FileText } from "lucide-react";
 import { exportCampaignToJSON, exportCampaignToPDF } from "@/lib/campaignExport";
 import { CampaignLog } from "@/components/CampaignLog";
 import { CampaignStats } from "@/components/CampaignStats";
 import { CampaignImport } from "@/components/CampaignImport";
+import { CampaignBranching } from "@/components/CampaignBranching";
 
 export default function CampaignPage() {
   const { savedScenarios, clearCampaign } = useCampaign();
-  const [activeTab, setActiveTab] = useState<'log' | 'stats'>('log');
+  const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching'>('log');
   const [importOpen, setImportOpen] = useState(false);
 
   return (
@@ -111,6 +112,17 @@ export default function CampaignPage() {
             <BarChart3 className="w-4 h-4 inline mr-2" />
             Statistics
           </button>
+          <button
+            onClick={() => setActiveTab('branching')}
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors ${
+              activeTab === 'branching'
+                ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                : 'text-white/50 hover:text-white/70'
+            }`}
+          >
+            <GitBranch className="w-4 h-4 inline mr-2" />
+            Campaign Chains
+          </button>
         </div>
       )}
 
@@ -141,8 +153,10 @@ export default function CampaignPage() {
             <div className="max-w-6xl mx-auto pb-20">
               {activeTab === 'log' ? (
                 <CampaignLog />
-              ) : (
+              ) : activeTab === 'stats' ? (
                 <CampaignStats />
+              ) : (
+                <CampaignBranching missions={savedScenarios} />
               )}
             </div>
           </div>

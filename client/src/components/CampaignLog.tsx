@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Trash2, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
+import { MissionOutcomeRecorder } from './MissionOutcomeRecorder';
 
 export function CampaignLog() {
   const { savedScenarios, deleteScenario, updateScenarioStatus, updateScenarioNotes } = useCampaign();
@@ -213,6 +214,25 @@ export function CampaignLog() {
                   Failed
                 </Button>
               </div>
+
+              {/* Outcome Recorder for Active Missions */}
+              {scenario.status === 'active' && (
+                <MissionOutcomeRecorder mission={scenario} />
+              )}
+
+              {/* Show Branched Missions */}
+              {scenario.outcome && (
+                <div className="bg-blue-900/20 border border-blue-700/50 rounded p-3">
+                  <p className="text-xs text-blue-300 mb-2">Mission Outcome: {scenario.outcome.outcome.toUpperCase()}</p>
+                  {scenario.outcome.consequences.length > 0 && (
+                    <div className="text-xs text-blue-200/80 space-y-1">
+                      {scenario.outcome.consequences.map((c, i) => (
+                        <p key={i}>• {c}</p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Notes */}
               <div className="bg-background rounded p-2">

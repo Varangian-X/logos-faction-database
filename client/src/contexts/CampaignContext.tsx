@@ -1,6 +1,24 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 
+export interface MissionOutcome {
+  id: string;
+  missionId: string;
+  outcome: 'success' | 'partial' | 'failure';
+  factionEffects: Record<string, number>; // faction name -> reputation change
+  consequences: string[];
+  nextMissionIds: string[];
+  completedAt: number;
+}
+
+export interface BranchingPath {
+  id: string;
+  parentMissionId: string;
+  condition: 'success' | 'partial' | 'failure';
+  nextMissionId: string;
+  description: string;
+}
+
 export interface SavedScenario {
   id: string;
   title: string;
@@ -15,6 +33,10 @@ export interface SavedScenario {
   createdAt: number;
   notes?: string;
   status: 'active' | 'completed' | 'failed';
+  parentMissionId?: string; // Links to previous mission in chain
+  outcome?: MissionOutcome;
+  factionReputation?: Record<string, number>; // Cumulative faction standing
+  branchingPaths?: BranchingPath[];
 }
 
 interface CampaignContextType {
@@ -33,6 +55,11 @@ interface CampaignContextType {
     byType: Record<string, number>;
     byFaction: Record<string, number>;
   };
+  recordMissionOutcome: (missionId: string, outcome: 'success' | 'partial' | 'failure', factionEffects: Record<string, number>, consequences: string[]) => void;
+  getAvailableBranches: (missionId: string) => SavedScenario[];
+  getFactionReputation: (missionId: string) => Record<string, number>;
+  generateBranchedMission: (parentMissionId: string, outcome: 'success' | 'partial' | 'failure') => SavedScenario | null;
+  getMissionChain: (missionId: string) => SavedScenario[];
 }
 
 const CampaignContext = createContext<CampaignContextType | undefined>(undefined);
@@ -99,6 +126,87 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const recordMissionOutcome = (missionId: string, outcome: 'success' | 'partial' | 'failure', factionEffects: Record<string, number>, consequences: string[]) => {
+    setSavedScenarios(prev => prev.map(s => {
+      if (s.id === missionId) {
+        const currentReputation = s.factionReputation || {};
+        const updatedReputation = { ...currentReputation };
+        Object.entries(factionEffects).forEach(([faction, change]) => {
+          updatedReputation[faction] = (updatedReputation[faction] || 0) + change;
+        });
+        return {
+          ...s,
+          status: outcome === 'failure' ? 'failed' : 'completed',
+          outcome: {
+            id: nanoid(),
+            missionId,
+            outcome,
+            factionEffects,
+            consequences,
+            nextMissionIds: [],
+            completedAt: Date.now(),
+          },
+          factionReputation: updatedReputation,
+        };
+      }
+      return s;
+    }));
+  };
+
+  const getFactionReputation = (missionId: string): Record<string, number> => {
+    const mission = savedScenarios.find(s => s.id === missionId);
+    return mission?.factionReputation || {};
+  };
+
+  const getMissionChain = (missionId: string): SavedScenario[] => {
+    const chain: SavedScenario[] = [];
+    let current = savedScenarios.find(s => s.id === missionId);
+    
+    while (current) {
+      chain.unshift(current);
+      if (current.parentMissionId) {
+        current = savedScenarios.find(s => s.id === current!.parentMissionId);
+      } else {
+        break;
+      }
+    }
+    return chain;
+  };
+
+  const getAvailableBranches = (missionId: string): SavedScenario[] => {
+    return savedScenarios.filter(s => s.parentMissionId === missionId && s.status === 'active');
+  };
+
+  const generateBranchedMission = (parentMissionId: string, outcome: 'success' | 'partial' | 'failure'): SavedScenario | null => {
+    const parentMission = savedScenarios.find(s => s.id === parentMissionId);
+    if (!parentMission) return null;
+
+    // Determine reputation modifiers based on outcome
+    const repModifier = outcome === 'success' ? 1 : outcome === 'partial' ? 0.5 : -1;
+    const currentRep = parentMission.factionReputation || {};
+
+    // Generate branched mission based on outcome and faction standing
+    const branchedMission: SavedScenario = {
+      id: nanoid(),
+      title: `${parentMission.title} - Aftermath`,
+      type: parentMission.type,
+      description: `Consequences of your previous mission. Outcome: ${outcome}`,
+      location: parentMission.location,
+      faction: parentMission.faction,
+      year: parentMission.year + 1,
+      objectives: [`Handle the aftermath of your ${outcome} mission`],
+      complications: outcome === 'failure' ? ['Enemies are emboldened', 'Resources are depleted'] : ['New opportunities emerge'],
+      rewards: outcome === 'success' ? ['Increased faction favor', 'Strategic advantage'] : ['Redemption opportunity'],
+      createdAt: Date.now(),
+      status: 'active',
+      parentMissionId,
+      factionReputation: currentRep,
+    };
+
+    setSavedScenarios(prev => [branchedMission, ...prev]);
+    return branchedMission;
+  };
+
   const getStatistics = () => {
     const stats = {
       total: savedScenarios.length,
@@ -131,6 +239,11 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
       clearCampaign,
       importCampaign,
       getStatistics,
+      recordMissionOutcome,
+      getAvailableBranches,
+      getFactionReputation,
+      generateBranchedMission,
+      getMissionChain,
     }}>
       {children}
     </CampaignContext.Provider>
@@ -161,4 +274,20 @@ export function validateCampaignJSON(data: unknown): data is SavedScenario[] {
     'complications' in item &&
     'rewards' in item
   );
+}
+
+export function calculateFactionInfluence(scenario: SavedScenario): Record<string, number> {
+  const influence: Record<string, number> = {};
+  
+  // Base influence from faction
+  influence[scenario.faction] = scenario.status === 'completed' ? 10 : scenario.status === 'failed' ? -5 : 0;
+  
+  // Outcome modifiers
+  if (scenario.outcome) {
+    Object.entries(scenario.outcome.factionEffects).forEach(([faction, effect]) => {
+      influence[faction] = (influence[faction] || 0) + effect;
+    });
+  }
+  
+  return influence;
 }
