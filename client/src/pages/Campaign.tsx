@@ -1,18 +1,17 @@
 import { useState } from "react";
-import { useCampaign, SavedScenario } from "@/contexts/CampaignContext";
+import { useCampaign } from "@/contexts/CampaignContext";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Link } from "wouter";
-import { ArrowLeft, Trash2, MapPin, Calendar, Flag, Target, AlertTriangle, Gift, FileText, Download, FileJson } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
-import { format } from "date-fns";
+import { ArrowLeft, Trash2, Download, FileJson, BarChart3, List } from "lucide-react";
+import { FileText } from "lucide-react";
 import { exportCampaignToJSON, exportCampaignToPDF } from "@/lib/campaignExport";
+import { CampaignLog } from "@/components/CampaignLog";
+import { CampaignStats } from "@/components/CampaignStats";
 
 export default function CampaignPage() {
-  const { savedScenarios, deleteScenario, updateScenarioNotes, clearCampaign } = useCampaign();
-  const [editingNotes, setEditingNotes] = useState<string | null>(null);
+  const { savedScenarios, clearCampaign } = useCampaign();
+  const [activeTab, setActiveTab] = useState<'log' | 'stats'>('log');
 
   return (
     <div className="h-screen w-full bg-[#050505] text-white overflow-hidden flex flex-col font-sans">
@@ -70,6 +69,34 @@ export default function CampaignPage() {
         )}
       </header>
 
+      {/* Tabs */}
+      {savedScenarios.length > 0 && (
+        <div className="relative z-20 border-b border-white/10 bg-black/40 px-6 flex gap-4">
+          <button
+            onClick={() => setActiveTab('log')}
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors ${
+              activeTab === 'log'
+                ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                : 'text-white/50 hover:text-white/70'
+            }`}
+          >
+            <List className="w-4 h-4 inline mr-2" />
+            Campaign Log
+          </button>
+          <button
+            onClick={() => setActiveTab('stats')}
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors ${
+              activeTab === 'stats'
+                ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                : 'text-white/50 hover:text-white/70'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4 inline mr-2" />
+            Statistics
+          </button>
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="flex-1 overflow-hidden relative z-10">
         {savedScenarios.length === 0 ? (
@@ -94,98 +121,12 @@ export default function CampaignPage() {
           </div>
         ) : (
           <div className="h-full overflow-y-auto custom-scrollbar p-8">
-            <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
-              {savedScenarios.map((scenario) => (
-                <Card key={scenario.id} className="bg-black/40 border-white/10 flex flex-col">
-                  <CardHeader className="pb-3 border-b border-white/5">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge variant="outline" className="text-[10px] border-[#D4AF37]/30 text-[#D4AF37]">
-                            {scenario.type}
-                          </Badge>
-                          <span className="text-[10px] font-mono text-white/30">
-                            {format(scenario.createdAt, 'yyyy-MM-dd HH:mm')}
-                          </span>
-                        </div>
-                        <CardTitle className="text-lg text-white">{scenario.title}</CardTitle>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => deleteScenario(scenario.id)}
-                        className="h-6 w-6 text-white/30 hover:text-red-400 hover:bg-red-900/10"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-mono text-white/50 mt-2">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-3 h-3" /> {scenario.location}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Flag className="w-3 h-3" /> {scenario.faction}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" /> {scenario.year} AD
-                      </div>
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent className="flex-1 py-4 space-y-4">
-                    <p className="text-sm text-white/80 italic border-l-2 border-white/10 pl-3">
-                      "{scenario.description}"
-                    </p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-[#D4AF37] text-xs font-bold uppercase">
-                          <Target className="w-3 h-3" /> Objectives
-                        </div>
-                        <ul className="list-disc list-inside text-white/70 text-xs space-y-1 ml-1">
-                          {scenario.objectives.map((obj, i) => (
-                            <li key={i}>{obj}</li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-red-400 text-xs font-bold uppercase">
-                          <AlertTriangle className="w-3 h-3" /> Complications
-                        </div>
-                        <ul className="list-disc list-inside text-white/70 text-xs space-y-1 ml-1">
-                          {scenario.complications.map((comp, i) => (
-                            <li key={i}>{comp}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-blue-400 text-xs font-bold uppercase">
-                        <Gift className="w-3 h-3" /> Rewards
-                      </div>
-                      <div className="flex gap-2 flex-wrap">
-                        {scenario.rewards.map((reward, i) => (
-                          <Badge key={i} variant="outline" className="text-[10px] border-white/10 text-white/60">
-                            {reward}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-
-                  <CardFooter className="bg-white/5 border-t border-white/5 p-4 flex-col items-stretch gap-2">
-                    <div className="text-xs font-mono text-white/40 uppercase">Campaign Notes</div>
-                    <Textarea 
-                      placeholder="Add mission notes, outcomes, or GM details..."
-                      className="bg-black/20 border-white/10 text-xs min-h-[60px] focus:border-[#D4AF37]/50"
-                      value={scenario.notes || ""}
-                      onChange={(e) => updateScenarioNotes(scenario.id, e.target.value)}
-                    />
-                  </CardFooter>
-                </Card>
-              ))}
+            <div className="max-w-6xl mx-auto pb-20">
+              {activeTab === 'log' ? (
+                <CampaignLog />
+              ) : (
+                <CampaignStats />
+              )}
             </div>
           </div>
         )}
