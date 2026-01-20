@@ -1,51 +1,38 @@
 import React, { useState } from 'react';
+import { useGameState } from '@/contexts/GameStateContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Ship, Plus, TrendingUp, Zap, Shield, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const SHIP_CLASSES = {
-  corvette: { name: 'Corvette', cost: 2000, upkeep: 100, combat: 10, speed: 30, capacity: 1 },
-  frigate: { name: 'Frigate', cost: 5000, upkeep: 250, combat: 25, speed: 20, capacity: 2 },
-  destroyer: { name: 'Destroyer', cost: 10000, upkeep: 500, combat: 50, speed: 15, capacity: 3 },
-  cruiser: { name: 'Cruiser', cost: 20000, upkeep: 1000, combat: 100, speed: 12, capacity: 5 },
-  battleship: { name: 'Battleship', cost: 50000, upkeep: 2500, combat: 250, speed: 8, capacity: 10 },
-  carrier: { name: 'Carrier', cost: 75000, upkeep: 3500, combat: 150, speed: 10, capacity: 20 }
-};
-
-export function calculateFleetPower(fleet = []) {
-  return fleet.reduce((sum, ship) => {
-    const shipClass = SHIP_CLASSES[ship.class];
-    const veterancy = (ship.experience || 0) / 10;
-    return sum + (shipClass?.combat || 0) * (1 + veterancy);
-  }, 0);
-}
-
-export function calculateFleetUpkeep(fleet = []) {
-  return fleet.reduce((sum, ship) => {
-    const shipClass = SHIP_CLASSES[ship.class];
-    return sum + (shipClass?.upkeep || 0);
-  }, 0);
-}
+import { SHIP_CLASSES, calculateFleetPower, calculateFleetUpkeep } from '@/lib/fleetManagement';
 
 export default function FleetManagementHub({ 
-  gameState,
   playerHouse,
-  onBuildShip,
-  onScrapShip,
-  onUpgradeShip,
   isProcessing 
 }) {
+  const { gameState, constructShip, updateFleet, removeFleet } = useGameState();
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedShip, setSelectedShip] = useState(null);
+  const [selectedFleetId, setSelectedFleetId] = useState(gameState.fleets[0]?.id || null);
   
-  const fleet = gameState.fleet || [];
-  const totalPower = calculateFleetPower(fleet);
-  const totalUpkeep = calculateFleetUpkeep(fleet);
+  const fleets = gameState.fleets || [];
+  const selectedFleet = fleets.find(f => f.id === selectedFleetId) || fleets[0];
+  
+  // Calculate totals across all fleets
+  const totalPower = fleets.reduce((sum, fleet) => sum + calculateFleetPower(fleet), 0);
+  const totalUpkeep = fleets.reduce((sum, fleet) => sum + calculateFleetUpkeep(fleet), 0);
+  const totalShips = fleets.reduce((sum, fleet) => sum + fleet.ships.reduce((s, stack) => s + stack.count, 0), 0);
+  
   const fleetCapacity = (playerHouse?.house_health?.muscle || 50) + 20;
   
+  const handleBuildShip = (shipClassId) => {
+    const targetFleetId = selectedFleetId || (fleets.length > 0 ? fleets[0].id : `fleet-${Date.now()}`);
+    constructShip(targetFleetId, shipClassId);
+    if (!selectedFleetId) setSelectedFleetId(targetFleetId);
+  };
+
   return (
     <div className="space-y-4">
       {/* Fleet Overview */}
@@ -60,10 +47,10 @@ export default function FleetManagementHub({
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-slate-800/50 rounded-lg p-2">
               <p className="text-[9px] text-gray-500 mb-1">Total Ships</p>
-              <p className="text-lg font-bold text-cyan-300">{fleet.length}</p>
+              <p className="text-lg font-bold text-cyan-300">{totalShips}</p>
             </div>
             <div className="bg-slate-800/50 rounded-lg p-2">
-              <p className="text-[9px] text-gray-500 mb-1">Fleet Power</p>
+              <p className="text-[9px] text-gray-500 mb-1">Total Power</p>
               <p className="text-lg font-bold text-purple-300">{Math.round(totalPower)}</p>
             </div>
             <div className="bg-slate-800/50 rounded-lg p-2">
@@ -75,56 +62,60 @@ export default function FleetManagementHub({
           <div>
             <div className="flex justify-between text-xs mb-1">
               <span className="text-gray-400">Fleet Capacity</span>
-              <span className="text-gray-300">{fleet.length}/{fleetCapacity}</span>
+              <span className="text-gray-300">{totalShips}/{fleetCapacity}</span>
             </div>
-            <Progress value={(fleet.length / fleetCapacity) * 100} className="h-2 bg-slate-800" />
+            <Progress value={(totalShips / fleetCapacity) * 100} className="h-2 bg-slate-800" />
           </div>
         </CardContent>
       </Card>
       
       {/* Current Fleet */}
-      {fleet.length > 0 && (
+      {selectedFleet && (
         <Card className="bg-slate-900/80 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-gray-300 text-sm">Your Fleet</CardTitle>
+            <CardTitle className="text-gray-300 text-sm flex justify-between items-center">
+              <span>{selectedFleet.name}</span>
+              <Badge variant="outline" className="text-xs">{selectedFleet.status}</Badge>
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            {fleet.map((ship, i) => {
-              const shipClass = SHIP_CLASSES[ship.class];
+            {selectedFleet.ships.map((stack, i) => {
+              const shipClass = SHIP_CLASSES.find(s => s.id === stack.shipClassId);
+              if (!shipClass) return null;
+              
               return (
                 <div 
-                  key={ship.id || i} 
+                  key={`${selectedFleet.id}-${stack.shipClassId}`} 
                   className={cn(
                     "bg-slate-800/50 rounded-lg p-3 border transition-all cursor-pointer",
-                    selectedShip?.id === ship.id ? "border-cyan-500" : "border-slate-700 hover:border-slate-600"
+                    selectedShip?.shipClassId === stack.shipClassId ? "border-cyan-500" : "border-slate-700 hover:border-slate-600"
                   )}
-                  onClick={() => setSelectedShip(ship)}
+                  onClick={() => setSelectedShip({ ...stack, fleetId: selectedFleet.id })}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <p className="text-xs font-bold text-cyan-300">{ship.name || shipClass.name}</p>
-                      <p className="text-[10px] text-gray-500">{shipClass.name}-class</p>
+                      <p className="text-xs font-bold text-cyan-300">{shipClass.name}</p>
+                      <p className="text-[10px] text-gray-500">{shipClass.type}</p>
                     </div>
                     <Badge className="bg-purple-500/20 text-purple-300 text-[9px]">
                       <Zap className="w-3 h-3 mr-1" />
-                      {shipClass.combat}
+                      {shipClass.combatPower * stack.count}
                     </Badge>
                   </div>
                   
                   <div className="grid grid-cols-3 gap-2 text-[9px] text-gray-400">
+                    <div>Count: {stack.count}</div>
                     <div>Speed: {shipClass.speed}</div>
-                    <div>XP: {ship.experience || 0}</div>
-                    <div>Upkeep: {shipClass.upkeep}₵</div>
+                    <div>Upkeep: {shipClass.maintenance.credits * stack.count}₵</div>
                   </div>
-                  
-                  {ship.status && (
-                    <Badge className="bg-amber-500/20 text-amber-300 text-[9px] mt-2">
-                      {ship.status}
-                    </Badge>
-                  )}
                 </div>
               );
             })}
+            {selectedFleet.ships.length === 0 && (
+                <div className="text-center text-gray-500 text-xs py-4">
+                    No ships in this fleet. Construct ships to deploy them here.
+                </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -138,33 +129,42 @@ export default function FleetManagementHub({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          {Object.entries(SHIP_CLASSES).map(([key, shipClass]) => {
-            const canAfford = (gameState.credits || 0) >= shipClass.cost;
-            const hasCapacity = fleet.length < fleetCapacity;
+          {SHIP_CLASSES.map((shipClass) => {
+            const canAfford = (gameState.credits || 0) >= shipClass.cost.credits &&
+                              (gameState.tech || 0) >= shipClass.cost.tech &&
+                              (gameState.manpower || 0) >= shipClass.cost.manpower;
+            const hasCapacity = totalShips < fleetCapacity;
             const canBuild = canAfford && hasCapacity;
             
             return (
               <div
-                key={key}
+                key={shipClass.id}
                 className={cn(
                   "bg-slate-800/50 rounded-lg p-3 border transition-all cursor-pointer",
-                  selectedClass === key ? "border-green-500 bg-green-500/10" : "border-slate-700",
+                  selectedClass === shipClass.id ? "border-green-500 bg-green-500/10" : "border-slate-700",
                   (!canAfford || !hasCapacity) && "opacity-50"
                 )}
-                onClick={() => canAfford && hasCapacity && setSelectedClass(key)}
+                onClick={() => canAfford && hasCapacity && setSelectedClass(shipClass.id)}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <Ship className="w-4 h-4 text-cyan-400" />
                     <span className="text-xs font-bold text-gray-200">{shipClass.name}</span>
                   </div>
-                  <span className="text-xs font-bold text-green-400">{shipClass.cost}₵</span>
+                  <div className="flex flex-col items-end">
+                    <span className={cn("text-xs font-bold", canAfford ? "text-green-400" : "text-red-400")}>
+                        {shipClass.cost.credits}₵
+                    </span>
+                    <span className="text-[9px] text-gray-500">
+                        {shipClass.cost.tech}T / {shipClass.cost.manpower}M
+                    </span>
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-4 gap-2 text-[9px] text-gray-400">
                   <div className="flex items-center gap-1">
                     <Zap className="w-3 h-3 text-purple-400" />
-                    {shipClass.combat}
+                    {shipClass.combatPower}
                   </div>
                   <div className="flex items-center gap-1">
                     <TrendingUp className="w-3 h-3 text-cyan-400" />
@@ -172,9 +172,9 @@ export default function FleetManagementHub({
                   </div>
                   <div className="flex items-center gap-1">
                     <Shield className="w-3 h-3 text-green-400" />
-                    {shipClass.capacity}
+                    {shipClass.cargoCapacity}
                   </div>
-                  <div className="text-amber-400">{shipClass.upkeep}₵/t</div>
+                  <div className="text-amber-400">{shipClass.maintenance.credits}₵/t</div>
                 </div>
               </div>
             );
@@ -183,18 +183,18 @@ export default function FleetManagementHub({
           {selectedClass && (
             <Button
               onClick={() => {
-                onBuildShip(selectedClass);
+                handleBuildShip(selectedClass);
                 setSelectedClass(null);
               }}
               disabled={isProcessing}
               className="w-full bg-green-600 hover:bg-green-700 mt-3"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Construct {SHIP_CLASSES[selectedClass].name}
+              Construct {SHIP_CLASSES.find(s => s.id === selectedClass)?.name}
             </Button>
           )}
           
-          {fleet.length >= fleetCapacity && (
+          {totalShips >= fleetCapacity && (
             <p className="text-xs text-red-400 text-center mt-2">
               Fleet capacity reached. Upgrade Muscle to expand.
             </p>
@@ -207,7 +207,7 @@ export default function FleetManagementHub({
         <Card className="bg-slate-900/80 border-cyan-500/50">
           <CardHeader>
             <CardTitle className="text-cyan-400 text-sm flex items-center justify-between">
-              <span>Manage: {selectedShip.name || SHIP_CLASSES[selectedShip.class].name}</span>
+              <span>Manage: {SHIP_CLASSES.find(s => s.id === selectedShip.shipClassId)?.name}</span>
               <Button
                 size="sm"
                 variant="ghost"
@@ -221,7 +221,7 @@ export default function FleetManagementHub({
           <CardContent className="space-y-2">
             <Button
               onClick={() => {
-                onUpgradeShip(selectedShip.id);
+                // Implement upgrade logic here
                 setSelectedShip(null);
               }}
               disabled={isProcessing}
@@ -234,7 +234,7 @@ export default function FleetManagementHub({
             
             <Button
               onClick={() => {
-                onScrapShip(selectedShip.id);
+                // Implement scrap logic here
                 setSelectedShip(null);
               }}
               disabled={isProcessing}
@@ -242,7 +242,7 @@ export default function FleetManagementHub({
               className="w-full"
               size="sm"
             >
-              Scrap Ship (Refund {Math.floor(SHIP_CLASSES[selectedShip.class].cost * 0.3)}₵)
+              Scrap Ship (Refund)
             </Button>
           </CardContent>
         </Card>

@@ -3,7 +3,7 @@ import { useGameState } from '@/contexts/GameStateContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Factory, TrendingUp, Ship, Building2 } from 'lucide-react';
+import { Factory, TrendingUp, Ship, Building2, Zap, Pickaxe, Beaker } from 'lucide-react';
 import { toast } from "sonner";
 
 // Placeholder components for missing dependencies
@@ -157,16 +157,24 @@ const EconomicDashboard = () => {
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center text-xs">
-                      <span className="text-slate-400">Credits</span>
+                      <span className="text-slate-400 flex items-center gap-2"><TrendingUp className="w-3 h-3" /> Credits</span>
                       <span className="text-slate-200 font-mono">{gameState.credits}</span>
                     </div>
                     <div className="flex justify-between items-center text-xs">
-                      <span className="text-slate-400">Metal</span>
+                      <span className="text-slate-400 flex items-center gap-2"><Pickaxe className="w-3 h-3" /> Metal</span>
                       <span className="text-slate-200 font-mono">{gameState.metal}</span>
                     </div>
                     <div className="flex justify-between items-center text-xs">
-                      <span className="text-slate-400">Energy</span>
+                      <span className="text-slate-400 flex items-center gap-2"><Zap className="w-3 h-3" /> Energy</span>
                       <span className="text-slate-200 font-mono">{gameState.energy}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-slate-400 flex items-center gap-2"><Beaker className="w-3 h-3" /> Tech</span>
+                      <span className="text-slate-200 font-mono">{gameState.tech}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-slate-400 flex items-center gap-2"><Ship className="w-3 h-3" /> Manpower</span>
+                      <span className="text-slate-200 font-mono">{gameState.manpower}</span>
                     </div>
                   </div>
                 </CardContent>

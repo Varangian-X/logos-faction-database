@@ -102,3 +102,14 @@ export function createFleet(name: string, owner: string, location: string): Flee
     status: "Idle",
   };
 }
+
+export function calculateFleetUpkeep(fleet: Fleet): number {
+  let upkeep = 0;
+  fleet.ships.forEach(stack => {
+    const shipClass = SHIP_CLASSES.find(s => s.id === stack.shipClassId);
+    if (shipClass) {
+      upkeep += shipClass.maintenance.credits * stack.count;
+    }
+  });
+  return upkeep;
+}
