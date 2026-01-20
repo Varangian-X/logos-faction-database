@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { SavedScenario } from '@/contexts/CampaignContext';
 import { useCampaign } from '@/contexts/CampaignContext';
 import { calculateFactionEffects, generateOutcomeConsequences } from '@/lib/factionDynamics';
+import { checkEventTriggers } from '@/lib/eventTriggers';
 
 interface MissionOutcomeRecorderProps {
   mission: SavedScenario;
@@ -23,6 +24,16 @@ export function MissionOutcomeRecorder({ mission, onOutcomeRecorded }: MissionOu
       const consequences = generateOutcomeConsequences(mission, outcome, currentRep);
 
       recordMissionOutcome(mission.id, outcome, factionEffects, consequences);
+
+      // Check for sector-wide event triggers
+      const triggeredEvent = checkEventTriggers(mission, outcome, 30492); // Using current year constant
+      if (triggeredEvent) {
+        // We need a way to add this event to the campaign state
+        // For now, we'll just log it or handle it via a context method if available
+        // Assuming we'll add an addSectorEvent method to CampaignContext later
+        console.log("Event Triggered:", triggeredEvent);
+        // TODO: Add event to campaign context
+      }
 
       // Generate branched mission
       const branchedMission = generateBranchedMission(mission.id, outcome);

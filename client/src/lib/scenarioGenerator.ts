@@ -4,7 +4,7 @@ import { FactionResources } from "./factionDynamics";
 export interface Scenario {
   id: string;
   title: string;
-  type: "Combat" | "Diplomacy" | "Espionage" | "Exploration" | "Horror" | "Assassination" | "Hostage Rescue" | "Supply Run" | "Bounty Contract" | "Heist/Raid";
+  type: "Combat" | "Diplomacy" | "Espionage" | "Exploration" | "Horror" | "Assassination" | "Hostage Rescue" | "Supply Run" | "Bounty Contract" | "Heist/Raid" | "Asset Capture";
   description: string;
   objectives: string[];
   complications: string[];
@@ -135,12 +135,38 @@ const missionTemplates = {
   ],
 };
 
-export function generateScenario(location: MapLocation, year: number, factionResources?: FactionResources): Scenario | null {
+export function generateScenario(location: MapLocation, year: number, factionResources?: FactionResources, playerAssets?: any[]): Scenario | null {
   const alignment = location.alignment;
-  const templates = missionTemplates[alignment] || missionTemplates["Neutral"];
+  let templates = [...(missionTemplates[alignment] || []), ...missionTemplates["Neutral"]];
   
-  // Filter templates based on resource availability
+  // Add Asset Capture missions if applicable
+  // 10% chance to generate an Asset Capture mission if not in player territory
+  if (Math.random() < 0.1) {
+    templates.push({
+      title: "Asset Seizure",
+      type: "Asset Capture",
+      desc: "A valuable enemy asset has been identified. Seize control of it to expand your influence.",
+      obj: ["Locate the asset", "Neutralize defenses", "Establish control"],
+      comp: ["Asset is rigged to blow", "Enemy reinforcements inbound", "Asset is damaged"],
+    });
+  }
+
+  // Filter templates based on resource availability and asset dependencies
   const availableTemplates = templates.filter(t => {
+    // Resource Dependency Chains: Check if player has required assets for certain missions
+    if (playerAssets) {
+      if (t.type === 'Trade Convoy' || t.type === 'Supply Run') {
+        // Need Trade Hub or Spaceport for trade missions
+        const hasTradeAsset = playerAssets.some(a => a.type === 'Trade Hub' || a.type === 'Spaceport');
+        if (!hasTradeAsset && Math.random() > 0.3) return false; // 70% chance to require asset
+      }
+      if (t.type === 'Combat' || t.type === 'Assassination') {
+        // Need Military Base for advanced combat missions
+        const hasMilitaryAsset = playerAssets.some(a => a.type === 'Military Base');
+        if (!hasMilitaryAsset && Math.random() > 0.3) return false;
+      }
+    }
+
     if (!factionResources) return true;
     
     // Define resource costs for mission types
@@ -148,6 +174,7 @@ export function generateScenario(location: MapLocation, year: number, factionRes
     if (t.type === 'Combat') costs.manpower = 10;
     if (t.type === 'Espionage') costs.tech = 10;
     if (t.type === 'Heist/Raid') costs.credits = 10;
+    if (t.type === 'Asset Capture') costs.manpower = 20; // High cost for capture
     
     // Check if faction has enough resources
     if (costs.manpower && factionResources.manpower < costs.manpower) return false;
@@ -171,6 +198,7 @@ export function generateScenario(location: MapLocation, year: number, factionRes
     "Supply Run": ["Cargo Delivery Bonus", "Trade Route Access", "Supplier Contacts"],
     "Bounty Contract": ["Bounty Reward", "Wanted Poster Removal", "Criminal Network Intel"],
     "Heist/Raid": ["Stolen Goods", "Vault Access", "Security Bypass Tech"],
+    "Asset Capture": ["New Asset Acquired", "Territory Control", "Resource Production Boost"],
   };
   
   const baseRewards = ["Credits", "Faction Reputation", "Rare Tech"];
@@ -185,6 +213,7 @@ export function generateScenario(location: MapLocation, year: number, factionRes
   if (template.type === 'Combat') resourceCost.manpower = 10;
   if (template.type === 'Espionage') resourceCost.tech = 10;
   if (template.type === 'Heist/Raid') resourceCost.credits = 10;
+  if (template.type === 'Asset Capture') resourceCost.manpower = 20;
 
   return {
     id: Math.random().toString(36).substr(2, 9),

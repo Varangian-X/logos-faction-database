@@ -45,7 +45,7 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({
   const [showStrengthOverlay, setShowStrengthOverlay] = useState(false);
   const [showPredictiveOverlay, setShowPredictiveOverlay] = useState(false);
   
-  const { savedScenarios } = useCampaign();
+  const { savedScenarios, playerAssets } = useCampaign();
   const campaignState = calculateCampaignState(savedScenarios);
   const factionReputation = Object.fromEntries(
     Object.entries(campaignState.factionStandings).map(([k, v]) => [k, v.reputation])

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
+import { PlayerAsset } from '@/lib/playerAssets';
 
 export interface MissionOutcome {
   id: string;
@@ -60,6 +61,9 @@ interface CampaignContextType {
   getFactionReputation: (missionId: string) => Record<string, number>;
   generateBranchedMission: (parentMissionId: string, outcome: 'success' | 'partial' | 'failure') => SavedScenario | null;
   getMissionChain: (missionId: string) => SavedScenario[];
+  playerAssets: PlayerAsset[];
+  addPlayerAsset: (asset: PlayerAsset) => void;
+  removePlayerAsset: (assetId: string) => void;
 }
 
 const CampaignContext = createContext<CampaignContextType | undefined>(undefined);
@@ -70,9 +74,26 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [playerAssets, setPlayerAssets] = useState<PlayerAsset[]>(() => {
+    const saved = localStorage.getItem('logos-player-assets');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   useEffect(() => {
     localStorage.setItem('logos-campaign-scenarios', JSON.stringify(savedScenarios));
   }, [savedScenarios]);
+
+  useEffect(() => {
+    localStorage.setItem('logos-player-assets', JSON.stringify(playerAssets));
+  }, [playerAssets]);
+
+  const addPlayerAsset = (asset: PlayerAsset) => {
+    setPlayerAssets(prev => [...prev, asset]);
+  };
+
+  const removePlayerAsset = (assetId: string) => {
+    setPlayerAssets(prev => prev.filter(a => a.id !== assetId));
+  };
 
   const saveScenario = (scenario: Omit<SavedScenario, 'id' | 'createdAt' | 'status'>) => {
     const newScenario: SavedScenario = {
@@ -244,6 +265,9 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
       getFactionReputation,
       generateBranchedMission,
       getMissionChain,
+      playerAssets,
+      addPlayerAsset,
+      removePlayerAsset,
     }}>
       {children}
     </CampaignContext.Provider>
