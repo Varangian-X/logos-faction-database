@@ -1,19 +1,21 @@
 import { useState } from "react";
+import { ArrowLeft, Trash2, Download, FileJson, BarChart3, List, Upload, GitBranch, Clock, Network } from "lucide-react";
+import { FileText } from "lucide-react";
 import { useCampaign } from "@/contexts/CampaignContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { ArrowLeft, Trash2, Download, FileJson, BarChart3, List, Upload, GitBranch } from "lucide-react";
-import { FileText } from "lucide-react";
 import { exportCampaignToJSON, exportCampaignToPDF } from "@/lib/campaignExport";
 import { CampaignLog } from "@/components/CampaignLog";
 import { CampaignStats } from "@/components/CampaignStats";
 import { CampaignImport } from "@/components/CampaignImport";
 import { CampaignBranching } from "@/components/CampaignBranching";
+import { MissionTimeline } from "@/components/MissionTimeline";
+import { FactionRelationshipNetwork } from "@/components/FactionRelationshipNetwork";
 
 export default function CampaignPage() {
   const { savedScenarios, clearCampaign } = useCampaign();
-  const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching'>('log');
+  const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching' | 'timeline' | 'network'>('log');
   const [importOpen, setImportOpen] = useState(false);
 
   return (
@@ -89,10 +91,10 @@ export default function CampaignPage() {
 
       {/* Tabs */}
       {savedScenarios.length > 0 && (
-        <div className="relative z-20 border-b border-white/10 bg-black/40 px-6 flex gap-4">
+        <div className="relative z-20 border-b border-white/10 bg-black/40 px-6 flex gap-4 overflow-x-auto">
           <button
             onClick={() => setActiveTab('log')}
-            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors ${
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${
               activeTab === 'log'
                 ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
                 : 'text-white/50 hover:text-white/70'
@@ -103,7 +105,7 @@ export default function CampaignPage() {
           </button>
           <button
             onClick={() => setActiveTab('stats')}
-            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors ${
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${
               activeTab === 'stats'
                 ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
                 : 'text-white/50 hover:text-white/70'
@@ -114,7 +116,7 @@ export default function CampaignPage() {
           </button>
           <button
             onClick={() => setActiveTab('branching')}
-            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors ${
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${
               activeTab === 'branching'
                 ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
                 : 'text-white/50 hover:text-white/70'
@@ -122,6 +124,28 @@ export default function CampaignPage() {
           >
             <GitBranch className="w-4 h-4 inline mr-2" />
             Campaign Chains
+          </button>
+          <button
+            onClick={() => setActiveTab('timeline')}
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${
+              activeTab === 'timeline'
+                ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                : 'text-white/50 hover:text-white/70'
+            }`}
+          >
+            <Clock className="w-4 h-4 inline mr-2" />
+            Timeline
+          </button>
+          <button
+            onClick={() => setActiveTab('network')}
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${
+              activeTab === 'network'
+                ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                : 'text-white/50 hover:text-white/70'
+            }`}
+          >
+            <Network className="w-4 h-4 inline mr-2" />
+            Factions
           </button>
         </div>
       )}
@@ -155,8 +179,12 @@ export default function CampaignPage() {
                 <CampaignLog />
               ) : activeTab === 'stats' ? (
                 <CampaignStats />
-              ) : (
+              ) : activeTab === 'branching' ? (
                 <CampaignBranching missions={savedScenarios} />
+              ) : activeTab === 'timeline' ? (
+                <MissionTimeline missions={savedScenarios} />
+              ) : (
+                <FactionRelationshipNetwork missions={savedScenarios} />
               )}
             </div>
           </div>
