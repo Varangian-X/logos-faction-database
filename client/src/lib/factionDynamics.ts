@@ -1,10 +1,17 @@
 import { SavedScenario, MissionOutcome } from '../contexts/CampaignContext';
 
+export interface FactionResources {
+  credits: number;
+  tech: number;
+  manpower: number;
+}
+
 export interface FactionStanding {
   faction: string;
   reputation: number;
   status: 'allied' | 'neutral' | 'hostile';
   influence: number;
+  resources: FactionResources;
 }
 
 export interface CampaignState {
@@ -195,12 +202,24 @@ export function calculateCampaignState(missions: SavedScenario[]): CampaignState
             reputation: rep,
             status: calculateFactionStanding(rep),
             influence: Math.abs(rep),
+            resources: { credits: 50, tech: 50, manpower: 50 } // Base resources
           };
         } else {
           factionStandings[faction].reputation = rep;
           factionStandings[faction].status = calculateFactionStanding(rep);
           factionStandings[faction].influence = Math.abs(rep);
         }
+        
+        // Update resources based on mission outcome and type
+        if (mission.status === 'completed') {
+          const standing = factionStandings[faction];
+          if (mission.type === 'Supply Run') standing.resources.credits += 10;
+          if (mission.type === 'Heist/Raid') standing.resources.credits -= 10;
+          if (mission.type === 'Espionage') standing.resources.tech += 5;
+          if (mission.type === 'Combat') standing.resources.manpower -= 5;
+          if (mission.type === 'Hostage Rescue') standing.resources.manpower += 5;
+        }
+
         totalReputation += rep;
       });
     }

@@ -6,8 +6,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { ZoomIn, ZoomOut, RotateCcw, Clock, Activity } from "lucide-react";
+import { ZoomIn, ZoomOut, RotateCcw, Clock, Activity, BrainCircuit } from "lucide-react";
 import { TimeLapseControl } from "./TimeLapseControl";
+import { PredictivePlanner } from "./PredictivePlanner";
+import { useCampaign } from "@/contexts/CampaignContext";
+import { calculateCampaignState } from "@/lib/factionDynamics";
 
 interface ImperialMapProps {
   onLocationSelect?: (location: MapLocation) => void;
@@ -40,6 +43,13 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [showTimeLapse, setShowTimeLapse] = useState(false);
   const [showStrengthOverlay, setShowStrengthOverlay] = useState(false);
+  const [showPredictiveOverlay, setShowPredictiveOverlay] = useState(false);
+  
+  const { savedScenarios } = useCampaign();
+  const campaignState = calculateCampaignState(savedScenarios);
+  const factionReputation = Object.fromEntries(
+    Object.entries(campaignState.factionStandings).map(([k, v]) => [k, v.reputation])
+  );
 
   // Time-lapse animation loop
   useEffect(() => {
@@ -457,19 +467,25 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({
         onWheel={handleWheel}
         className="flex-1 cursor-grab active:cursor-grabbing"
       />
-
-      {/* Controls */}
-      <div className="absolute top-4 right-4 flex gap-2 z-20">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setZoom(Math.min(6, zoom * 1.2))}
-          className="bg-black/60 border-white/20 hover:bg-black/80"
-          title="Zoom In"
-        >
-          <ZoomIn className="w-4 h-4" />
-        </Button>
-        <Button
+          {/* Controls */}
+        <div className="absolute top-4 right-4 flex flex-col gap-2 z-20">
+          <Button
+            variant={showPredictiveOverlay ? "default" : "outline"}
+            size="icon"
+            onClick={() => setShowPredictiveOverlay(!showPredictiveOverlay)}
+            className={`border-white/20 ${showPredictiveOverlay ? 'bg-amber-600 text-white' : 'bg-black/60 text-white hover:bg-black/80'}`}
+            title="Toggle Predictive Analysis Overlay"
+          >
+            <BrainCircuit className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setZoom(z => Math.min(z * 1.2, 5))}
+            className="bg-black/60 border-white/20 text-white hover:bg-black/80"
+          >
+            <ZoomIn className="w-4 h-4" />
+          </Button> <Button
           variant="outline"
           size="icon"
           onClick={() => setZoom(Math.max(0.5, zoom * 0.8))}
@@ -607,7 +623,7 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-sm border border-[#D4AF37]/50 rounded-lg p-4 max-w-sm z-20"
+            className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-sm border border-[#D4AF37]/50 rounded-lg p-4 max-w-sm z-20 max-h-[80vh] overflow-y-auto custom-scrollbar"
           >
             <div className="space-y-3">
               <div>
@@ -658,6 +674,33 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({
                       <li key={t}>• {t}</li>
                     ))}
                   </ul>
+                </div>
+              )}
+
+              {showPredictiveOverlay && (
+                <div className="pt-4 border-t border-white/10">
+                  <h4 className="text-xs font-bold text-amber-500 mb-2 flex items-center gap-2">
+                    <BrainCircuit className="w-3 h-3" />
+                    STRATEGIC PREDICTION
+                  </h4>
+                  <PredictivePlanner 
+                    mission={{
+                      id: 'temp_prediction',
+                      title: `Operation: ${selectedLocation.name}`,
+                      description: `Hypothetical operation in ${selectedLocation.name}`,
+                      type: 'Combat',
+                      faction: selectedLocation.controllingFaction,
+                      location: selectedLocation.name,
+                      year: currentYear,
+                      status: 'active',
+                      objectives: [],
+                      complications: [],
+                      factionReputation: { [selectedLocation.controllingFaction]: 0 },
+                      rewards: [],
+                      createdAt: Date.now()
+                    }}
+                    currentReputation={factionReputation}
+                  />
                 </div>
               )}
             </div>

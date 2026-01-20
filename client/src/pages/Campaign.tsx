@@ -13,18 +13,24 @@ import { CampaignBranching } from "@/components/CampaignBranching";
 import { MissionTimeline } from "@/components/MissionTimeline";
 import { FactionRelationshipNetwork } from "@/components/FactionRelationshipNetwork";
 import { MilestoneTracker } from "@/components/MilestoneTracker";
-import { checkMilestones, CAMPAIGN_MILESTONES } from "@/lib/milestoneSystem";
+import { CustomMilestoneCreator } from "@/components/CustomMilestoneCreator";
+import { checkMilestones, CAMPAIGN_MILESTONES, Milestone } from "@/lib/milestoneSystem";
 import { calculateCampaignState } from "@/lib/factionDynamics";
 
 export default function CampaignPage() {
   const { savedScenarios, clearCampaign } = useCampaign();
   const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching' | 'timeline' | 'network' | 'milestones'>('log');
   const [importOpen, setImportOpen] = useState(false);
+  const [customMilestones, setCustomMilestones] = useState<Milestone[]>([]);
 
   const campaignState = calculateCampaignState(savedScenarios);
   const milestones = checkMilestones(savedScenarios, Object.fromEntries(
     Object.entries(campaignState.factionStandings).map(([k, v]) => [k, v.reputation])
-  ));
+  ), [...CAMPAIGN_MILESTONES, ...customMilestones]);
+
+  const handleAddCustomMilestone = (milestone: Milestone) => {
+    setCustomMilestones(prev => [...prev, milestone]);
+  };
 
   return (
     <div className="h-screen w-full bg-[#050505] text-white overflow-hidden flex flex-col font-sans">
@@ -205,7 +211,12 @@ export default function CampaignPage() {
               ) : activeTab === 'network' ? (
                 <FactionRelationshipNetwork missions={savedScenarios} />
               ) : (
-                <MilestoneTracker milestones={milestones} />
+                <div className="space-y-6">
+                  <div className="flex justify-end">
+                    <CustomMilestoneCreator onAddMilestone={handleAddCustomMilestone} />
+                  </div>
+                  <MilestoneTracker milestones={milestones} />
+                </div>
               )}
             </div>
           </div>
