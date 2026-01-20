@@ -19,17 +19,19 @@ import { PlayerAssetsManager } from "@/components/PlayerAssetsManager";
 import { SectorEventsPanel } from "@/components/SectorEventsPanel";
 import { checkMilestones, CAMPAIGN_MILESTONES, Milestone } from "@/lib/milestoneSystem";
 import { calculateCampaignState } from "@/lib/factionDynamics";
-import { Coins, Package, AlertTriangle, Zap, Handshake } from "lucide-react";
+import { Coins, Package, AlertTriangle, Zap, Handshake, Scroll, Anchor } from "lucide-react";
 import { PlayerAsset } from "@/lib/playerAssets";
 import { SectorEvent } from "@/lib/sectorWideEvents";
 import { FactionAIController } from "@/components/FactionAIController";
 import { TechTreePanel } from "@/components/TechTreePanel";
 import { DiplomacyPanel } from "@/components/DiplomacyPanel";
+import { GovernancePanel } from "@/components/GovernancePanel";
+import { FleetPanel } from "@/components/FleetPanel";
 import { TECH_TREE } from "@/lib/techTree";
 
 export default function CampaignPage() {
   const { savedScenarios, clearCampaign } = useCampaign();
-  const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching' | 'timeline' | 'network' | 'milestones' | 'economy' | 'assets' | 'events' | 'tech' | 'diplomacy'>('log');
+  const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching' | 'timeline' | 'network' | 'milestones' | 'economy' | 'assets' | 'events' | 'tech' | 'diplomacy' | 'governance' | 'fleet'>('log');
   const [importOpen, setImportOpen] = useState(false);
   const [customMilestones, setCustomMilestones] = useState<Milestone[]>([]);
   const [playerAssets, setPlayerAssets] = useState<PlayerAsset[]>([]);
@@ -241,6 +243,28 @@ export default function CampaignPage() {
             <Handshake className="w-4 h-4 inline mr-2" />
             Diplomacy
           </button>
+          <button
+            onClick={() => setActiveTab('governance')}
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${
+              activeTab === 'governance'
+                ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                : 'text-white/50 hover:text-white/70'
+            }`}
+          >
+            <Scroll className="w-4 h-4 inline mr-2" />
+            Governance
+          </button>
+          <button
+            onClick={() => setActiveTab('fleet')}
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${
+              activeTab === 'fleet'
+                ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                : 'text-white/50 hover:text-white/70'
+            }`}
+          >
+            <Anchor className="w-4 h-4 inline mr-2" />
+            Fleet
+          </button>
         </div>
       )}
 
@@ -315,6 +339,10 @@ export default function CampaignPage() {
                     console.log(`Performed ${actionId} with ${factionId}`);
                   }}
                 />
+              ) : activeTab === 'governance' ? (
+                <GovernancePanel />
+              ) : activeTab === 'fleet' ? (
+                <FleetPanel />
               ) : (
                 <div className="space-y-6">
                   <div className="flex justify-end">

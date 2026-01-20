@@ -4,7 +4,7 @@ import { FactionResources } from "./factionDynamics";
 export interface PlayerAsset {
   id: string;
   name: string;
-  type: "Mining Outpost" | "Research Lab" | "Trade Hub" | "Military Base" | "Spaceport";
+  type: "Mining Outpost" | "Research Lab" | "Trade Hub" | "Military Base" | "Spaceport" | "Spy Network";
   location: string;
   locationName: string;
   owner: string; // faction name
@@ -85,6 +85,19 @@ export const assetTemplates: Record<string, Omit<PlayerAsset, 'id' | 'owner' | '
     acquisitionMethod: "Purchase",
     description: "Hub for space commerce and military operations. Generates diverse resources.",
   },
+  "Spy Network": {
+    name: "Spy Network",
+    type: "Spy Network",
+    location: "",
+    locationName: "",
+    purchasePrice: 90,
+    level: 1,
+    tierName: "Spy Network",
+    productionRate: { credits: 0, tech: 15, manpower: 0 },
+    maintenanceCost: { credits: 15, tech: 0, manpower: 0 },
+    acquisitionMethod: "Purchase",
+    description: "Gather intelligence on rival factions. Reveals hidden assets and strategies.",
+  },
 };
 
 export function createPlayerAsset(
@@ -121,6 +134,7 @@ export const assetTierNames: Record<string, string[]> = {
   "Trade Hub": ["Trade Hub", "Commerce Center", "Galactic Exchange"],
   "Military Base": ["Military Base", "Fortress", "Citadel"],
   "Spaceport": ["Spaceport", "Orbital Dock", "Star Fortress"],
+  "Spy Network": ["Spy Network", "Intelligence Agency", "Shadow Directorate"],
 };
 
 export function upgradeAsset(asset: PlayerAsset): PlayerAsset {
