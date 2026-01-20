@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useCampaign } from '@/contexts/CampaignContext';
+import { Button } from '@/components/ui/button';
+import { ShieldAlert } from 'lucide-react';
 import { initializeFactionAI, processFactionAITurn, FactionAIState } from '@/lib/factionAI';
 import { mapLocations } from '@/lib/mapData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,9 +13,9 @@ interface FactionAIControllerProps {
 }
 
 export function FactionAIController({ currentYear }: FactionAIControllerProps) {
-  const { playerAssets } = useCampaign();
+  const { playerAssets, addScenario } = useCampaign();
   const [aiStates, setAiStates] = useState<Record<string, FactionAIState>>({});
-  const [logs, setLogs] = useState<{ year: number; message: string }[]>([]);
+  const [logs, setLogs] = useState<{ year: number; message: string; missionId?: string }[]>([]);
 
   // Initialize AI for major factions
   useEffect(() => {
@@ -41,10 +43,28 @@ export function FactionAIController({ currentYear }: FactionAIControllerProps) {
     Object.keys(newStates).forEach(factionId => {
       const state = newStates[factionId];
       if (state.lastActionYear < currentYear) {
-        const { newState, actions } = processFactionAITurn(state, currentYear, playerAssets, mapLocations);
+        const { newState, actions, generatedMission } = processFactionAITurn(state, currentYear, playerAssets, mapLocations);
         newStates[factionId] = newState;
+        
+        let missionId: string | undefined;
+        if (generatedMission) {
+          addScenario({
+            ...generatedMission,
+            location: playerAssets.find(a => a.status === "Active")?.location || "Unknown",
+            faction: state.factionId,
+            year: currentYear,
+            createdAt: Date.now(),
+            status: 'active'
+          });
+          missionId = generatedMission.id;
+        }
+
         actions.forEach(action => {
-          newLogs.push({ year: currentYear, message: action });
+          newLogs.push({ 
+            year: currentYear, 
+            message: action, 
+            missionId: action.includes("raid") ? missionId : undefined 
+          } as { year: number; message: string; missionId?: string });
         });
       }
     });
@@ -69,9 +89,26 @@ export function FactionAIController({ currentYear }: FactionAIControllerProps) {
         <ScrollArea className="h-[200px]">
           <div className="space-y-2">
             {logs.map((log, index) => (
-              <div key={index} className="text-xs flex gap-2">
-                <span className="text-white/40 font-mono">{log.year}</span>
-                <span className="text-white/80">{log.message}</span>
+              <div key={index} className="text-xs flex items-center gap-2 justify-between">
+                <div className="flex gap-2">
+                  <span className="text-white/40 font-mono">{log.year}</span>
+                  <span className="text-white/80">{log.message}</span>
+                </div>
+                {log.missionId && (
+                  <Button 
+                    size="sm" 
+                    variant="destructive" 
+                    className="h-6 text-[10px] px-2"
+                    onClick={() => {
+                      // Navigate to campaign log or open mission details
+                      // For now just show alert
+                      alert("Check Campaign Log for Asset Defense mission!");
+                    }}
+                  >
+                    <ShieldAlert className="w-3 h-3 mr-1" />
+                    DEFEND
+                  </Button>
+                )}
               </div>
             ))}
           </div>

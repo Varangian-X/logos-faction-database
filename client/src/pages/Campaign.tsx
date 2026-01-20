@@ -19,18 +19,23 @@ import { PlayerAssetsManager } from "@/components/PlayerAssetsManager";
 import { SectorEventsPanel } from "@/components/SectorEventsPanel";
 import { checkMilestones, CAMPAIGN_MILESTONES, Milestone } from "@/lib/milestoneSystem";
 import { calculateCampaignState } from "@/lib/factionDynamics";
-import { Coins, Package, AlertTriangle } from "lucide-react";
+import { Coins, Package, AlertTriangle, Zap, Handshake } from "lucide-react";
 import { PlayerAsset } from "@/lib/playerAssets";
 import { SectorEvent } from "@/lib/sectorWideEvents";
 import { FactionAIController } from "@/components/FactionAIController";
+import { TechTreePanel } from "@/components/TechTreePanel";
+import { DiplomacyPanel } from "@/components/DiplomacyPanel";
+import { TECH_TREE } from "@/lib/techTree";
 
 export default function CampaignPage() {
   const { savedScenarios, clearCampaign } = useCampaign();
-  const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching' | 'timeline' | 'network' | 'milestones' | 'economy' | 'assets' | 'events'>('log');
+  const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching' | 'timeline' | 'network' | 'milestones' | 'economy' | 'assets' | 'events' | 'tech' | 'diplomacy'>('log');
   const [importOpen, setImportOpen] = useState(false);
   const [customMilestones, setCustomMilestones] = useState<Milestone[]>([]);
   const [playerAssets, setPlayerAssets] = useState<PlayerAsset[]>([]);
   const [sectorEvents, setSectorEvents] = useState<SectorEvent[]>([]);
+  const [techState, setTechState] = useState<{ unlockedTechs: string[]; researchProgress: Record<string, number> }>({ unlockedTechs: [], researchProgress: {} });
+  const [techResources, setTechResources] = useState(500); // Starting tech points
 
   const campaignState = calculateCampaignState(savedScenarios);
   const milestones = checkMilestones(savedScenarios, Object.fromEntries(
@@ -214,6 +219,28 @@ export default function CampaignPage() {
             <AlertTriangle className="w-4 h-4 inline mr-2" />
             Events
           </button>
+          <button
+            onClick={() => setActiveTab('tech')}
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${
+              activeTab === 'tech'
+                ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                : 'text-white/50 hover:text-white/70'
+            }`}
+          >
+            <Zap className="w-4 h-4 inline mr-2" />
+            Tech Tree
+          </button>
+          <button
+            onClick={() => setActiveTab('diplomacy')}
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${
+              activeTab === 'diplomacy'
+                ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                : 'text-white/50 hover:text-white/70'
+            }`}
+          >
+            <Handshake className="w-4 h-4 inline mr-2" />
+            Diplomacy
+          </button>
         </div>
       )}
 
@@ -268,6 +295,26 @@ export default function CampaignPage() {
                   <SectorEventsPanel events={sectorEvents} currentYear={30492} />
                   <FactionAIController currentYear={30492} />
                 </div>
+              ) : activeTab === 'tech' ? (
+                <TechTreePanel 
+                  techState={techState}
+                  currentTechResources={techResources}
+                  onUnlockTech={(techId, cost) => {
+                    setTechState(prev => ({ ...prev, unlockedTechs: [...prev.unlockedTechs, techId] }));
+                    setTechResources(prev => prev - cost);
+                  }}
+                />
+              ) : activeTab === 'diplomacy' ? (
+                <DiplomacyPanel 
+                  factions={Object.keys(campaignState.factionStandings)}
+                  factionReputations={Object.fromEntries(
+                    Object.entries(campaignState.factionStandings).map(([k, v]) => [k, v.reputation])
+                  )}
+                  onPerformAction={(factionId, actionId) => {
+                    // Handle diplomatic action
+                    console.log(`Performed ${actionId} with ${factionId}`);
+                  }}
+                />
               ) : (
                 <div className="space-y-6">
                   <div className="flex justify-end">

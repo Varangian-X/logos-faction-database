@@ -26,14 +26,17 @@ export function initializeFactionAI(factionId: string, strategy: FactionAIState[
   };
 }
 
+import { Scenario } from "./scenarioGenerator";
+
 export function processFactionAITurn(
   aiState: FactionAIState,
   currentYear: number,
   playerAssets: PlayerAsset[],
   mapLocations: MapLocation[]
-): { newState: FactionAIState; actions: string[] } {
+): { newState: FactionAIState; actions: string[]; generatedMission?: Scenario } {
   const newState = { ...aiState };
   const actions: string[] = [];
+  let generatedMission: Scenario | undefined;
 
   // 1. Resource Generation
   newState.resources.credits += 50; // Base income
@@ -71,13 +74,24 @@ export function processFactionAITurn(
       // 20% chance to raid
       if (Math.random() < 0.2) {
         actions.push(`${newState.factionId} launched a raid on your ${playerTarget.name} at ${playerTarget.locationName}!`);
-        // In a full implementation, this would trigger a mission or reduce asset health
+        
+        // Generate Asset Defense mission
+        generatedMission = {
+          id: Math.random().toString(36).substr(2, 9),
+          title: `Defend ${playerTarget.name}`,
+          type: "Asset Defense",
+          description: `${newState.factionId} forces are attempting to seize your ${playerTarget.name} at ${playerTarget.locationName}. Repel them immediately!`,
+          objectives: ["Secure the perimeter", "Repel enemy waves", "Protect asset integrity"],
+          complications: ["Enemy has heavy armor", "Asset is taking damage", "Civilian workers trapped"],
+          rewards: ["Asset Secured", "Faction Reputation", "Combat Experience"],
+          resourceCost: { manpower: 10 }
+        };
       }
     }
   }
 
   newState.lastActionYear = currentYear;
-  return { newState, actions };
+  return { newState, actions, generatedMission };
 }
 
 function findExpansionTarget(aiState: FactionAIState, locations: MapLocation[], playerAssets: PlayerAsset[]): MapLocation | null {

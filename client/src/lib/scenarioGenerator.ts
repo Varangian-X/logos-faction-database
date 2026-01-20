@@ -4,7 +4,7 @@ import { FactionResources } from "./factionDynamics";
 export interface Scenario {
   id: string;
   title: string;
-  type: "Combat" | "Diplomacy" | "Espionage" | "Exploration" | "Horror" | "Assassination" | "Hostage Rescue" | "Supply Run" | "Bounty Contract" | "Heist/Raid" | "Asset Capture";
+  type: "Combat" | "Diplomacy" | "Espionage" | "Exploration" | "Horror" | "Assassination" | "Hostage Rescue" | "Supply Run" | "Bounty Contract" | "Heist/Raid" | "Asset Capture" | "Asset Defense";
   description: string;
   objectives: string[];
   complications: string[];
@@ -199,6 +199,7 @@ export function generateScenario(location: MapLocation, year: number, factionRes
     "Bounty Contract": ["Bounty Reward", "Wanted Poster Removal", "Criminal Network Intel"],
     "Heist/Raid": ["Stolen Goods", "Vault Access", "Security Bypass Tech"],
     "Asset Capture": ["New Asset Acquired", "Territory Control", "Resource Production Boost"],
+    "Asset Defense": ["Asset Secured", "Defensive Upgrade", "Loyalty Boost"],
   };
   
   const baseRewards = ["Credits", "Faction Reputation", "Rare Tech"];
@@ -214,6 +215,7 @@ export function generateScenario(location: MapLocation, year: number, factionRes
   if (template.type === 'Espionage') resourceCost.tech = 10;
   if (template.type === 'Heist/Raid') resourceCost.credits = 10;
   if (template.type === 'Asset Capture') resourceCost.manpower = 20;
+  if (template.type === 'Asset Defense') resourceCost.manpower = 15;
 
   return {
     id: Math.random().toString(36).substr(2, 9),

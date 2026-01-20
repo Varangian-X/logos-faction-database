@@ -43,6 +43,7 @@ export interface SavedScenario {
 interface CampaignContextType {
   savedScenarios: SavedScenario[];
   saveScenario: (scenario: Omit<SavedScenario, 'id' | 'createdAt' | 'status'>) => void;
+  addScenario: (scenario: SavedScenario) => void;
   deleteScenario: (id: string) => void;
   updateScenarioNotes: (id: string, notes: string) => void;
   updateScenarioStatus: (id: string, status: 'active' | 'completed' | 'failed') => void;
@@ -103,6 +104,10 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
       status: 'active',
     };
     setSavedScenarios(prev => [newScenario, ...prev]);
+  };
+
+  const addScenario = (scenario: SavedScenario) => {
+    setSavedScenarios(prev => [scenario, ...prev]);
   };
 
   const deleteScenario = (id: string) => {
@@ -253,7 +258,8 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
   return (
     <CampaignContext.Provider value={{ 
       savedScenarios, 
-      saveScenario, 
+      saveScenario,
+      addScenario,
       deleteScenario, 
       updateScenarioNotes,
       updateScenarioStatus,
