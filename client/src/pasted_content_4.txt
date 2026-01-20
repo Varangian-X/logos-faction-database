@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logos Imperium: Faction Command</title>
+    <!-- Tailwind CSS for sleek, modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'void': '#0b0f19',
+                        'gold': '#fbbf24',
+                        'data': '#06b6d4',
+                        'alert': '#ef4444'
+                    },
+                    fontFamily: {
+                        'mono': ['Courier New', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0b0f19; color: #e5e7eb; }
+        .scan-line {
+            width: 100%;
+            height: 2px;
+            background: rgba(6, 182, 212, 0.5);
+            animation: scan 3s linear infinite;
+        }
+        @keyframes scan { 0% { transform: translateY(0); } 100% { transform: translateY(100vh); } }
+    </style>
+</head>
+<body class="font-mono h-screen overflow-hidden flex flex-col">
+
+    <!-- Header -->
+    <header class="border-b border-gold p-4 flex justify-between items-center bg-void z-10">
+        <div>
+            <h1 class="text-xl text-gold font-bold tracking-widest">LOGOS IMPERIUM</h1>
+            <p class="text-xs text-data">FACTION INTERFACE // VERMILION CLEARANCE</p>
+        </div>
+        <div class="text-right">
+            <div id="clock" class="text-white">30,492 AD</div>
+            <div class="text-xs text-alert blink">CONNECTION: SECURE</div>
+        </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 p-4 z-10 overflow-y-auto">
+        
+        <!-- Column 1: Faction Status -->
+        <div class="border border-gray-700 bg-opacity-50 bg-gray-900 p-4 rounded">
+            <h2 class="text-data mb-4 border-b border-gray-700 pb-2">ACTIVE FACTIONS</h2>
+            
+            <div class="mb-4">
+                <div class="flex justify-between text-sm mb-1">
+                    <span>Neo-Praetorians</span>
+                    <span class="text-gold">DOMINANT</span>
+                </div>
+                <div class="w-full bg-gray-700 h-2 rounded">
+                    <div class="bg-gold h-2 rounded" style="width: 85%"></div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="flex justify-between text-sm mb-1">
+                    <span>Agentes en Rebus</span>
+                    <span class="text-purple-400">HIDDEN</span>
+                </div>
+                <div class="w-full bg-gray-700 h-2 rounded">
+                    <div class="bg-purple-500 h-2 rounded" style="width: 60%"></div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="flex justify-between text-sm mb-1">
+                    <span>Neo-Varangians</span>
+                    <span class="text-alert">COMBAT</span>
+                </div>
+                <div class="w-full bg-gray-700 h-2 rounded">
+                    <div class="bg-alert h-2 rounded" style="width: 45%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Column 2: The Map/Grid (Interactive) -->
+        <div class="border border-gold p-4 relative bg-black">
+            <div class="absolute inset-0 opacity-20 pointer-events-none" 
+                 style="background-image: radial-gradient(#06b6d4 1px, transparent 1px); background-size: 20px 20px;">
+            </div>
+            
+            <h2 class="text-gold mb-4 text-center">SECTOR CONTROL</h2>
+            
+            <!-- Simple Grid Minigame -->
+            <div class="grid grid-cols-3 gap-2 h-64">
+                <button onclick="selectZone('Chrysopolis')" class="border border-gray-600 hover:bg-gold hover:text-black transition flex items-center justify-center">
+                    Chrysopolis
+                </button>
+                <button onclick="selectZone('Mese')" class="border border-gray-600 hover:bg-data hover:text-black transition flex items-center justify-center">
+                    Mese
+                </button>
+                <button onclick="selectZone('Cisterns')" class="border border-gray-600 hover:bg-alert hover:text-black transition flex items-center justify-center">
+                    Cisterns
+                </button>
+                <!-- More grid items could be added -->
+            </div>
+            
+            <div id="zone-info" class="mt-4 text-xs text-gray-400 p-2 border-t border-gray-800">
+                SELECT A ZONE TO VIEW INTEL.
+            </div>
+        </div>
+
+        <!-- Column 3: Command Terminal -->
+        <div class="border border-gray-700 bg-gray-900 p-4 flex flex-col">
+            <h2 class="text-alert mb-2">COMMAND LINE</h2>
+            <div id="console-output" class="flex-1 overflow-y-auto text-xs text-green-400 font-mono mb-2 p-2 bg-black border border-gray-800 h-48">
+                > SYSTEM INITIALIZED...<br>
+                > WAITING FOR INPUT...
+            </div>
+            <div class="flex gap-2">
+                <input type="text" id="cmd-input" placeholder="Enter Directive..." class="flex-1 bg-gray-800 border border-gray-600 text-white p-2 text-sm focus:outline-none focus:border-gold">
+                <button onclick="sendCommand()" class="bg-gold text-black px-4 py-2 text-sm font-bold hover:bg-yellow-500">EXECUTE</button>
+            </div>
+        </div>
+
+    </main>
+
+    <div class="scan-line fixed top-0 left-0 pointer-events-none z-50"></div>
+
+    <script>
+        // Simple Minigame Logic
+        
+        function selectZone(zone) {
+            const display = document.getElementById('zone-info');
+            const data = {
+                'Chrysopolis': "CONTROL: Neo-Praetorians. STATUS: Secure. RESOURCES: High.",
+                'Mese': "CONTROL: Contested. STATUS: Active Trading. RESOURCES: Medium.",
+                'Cisterns': "CONTROL: Anarchy. STATUS: Riot Protocols. RESOURCES: Low."
+            };
+            display.innerText = `>> ANALYZING ${zone.toUpperCase()}...\n${data[zone]}`;
+            log(`Scanning sector: ${zone}`);
+        }
+
+        function sendCommand() {
+            const input = document.getElementById('cmd-input');
+            const cmd = input.value.trim();
+            if (cmd) {
+                log(`> ${cmd}`);
+                setTimeout(() => {
+                    log(`PROCESSING: "${cmd}"...`);
+                    // In a real app, this would call google.script.run.handlePlayerAction(cmd)
+                    log(`RESPONSE: Directive acknowledged. Resources deducted.`);
+                }, 600);
+                input.value = '';
+            }
+        }
+
+        function log(text) {
+            const console = document.getElementById('console-output');
+            console.innerHTML += `<br>> ${text}`;
+            console.scrollTop = console.scrollHeight;
+        }
+    </script>
+</body>
+</html>

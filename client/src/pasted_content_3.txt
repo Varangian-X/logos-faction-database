@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logos Imperium // Citizen Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'void-dark': '#050505',
+                        'void-panel': '#0a0f14',
+                        'imperial-gold': '#ffd700',
+                        'gold-dim': '#b8860b',
+                        'hologram-blue': '#00f3ff',
+                        'alert-red': '#ff3333',
+                        'stasis-grey': '#2a2a2a'
+                    },
+                    fontFamily: {
+                        'header': ['"Cinzel"', 'serif'],
+                        'terminal': ['"Share Tech Mono"', 'monospace'],
+                    },
+                    backgroundImage: {
+                        'hex-pattern': "url('data:image/svg+xml,%3Csvg width=\"24\" height=\"40\" viewBox=\"0 0 24 40\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cpath d=\"M0 40c5.523 0 10-4.477 10-10V10c0-5.523-4.477-10-10-10s-10 4.477-10 10v20c0 5.523 4.477 10 10 10z\" fill=\"%231a1a1a\" fill-opacity=\"0.1\" fill-rule=\"evenodd\"/%3E%3C/svg%3E')",
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #e0e0e0;
+        }
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 215, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            animation: scan 4s linear infinite;
+            pointer-events: none;
+            z-index: 50;
+        }
+        @keyframes scan {
+            0% { top: -10%; }
+            100% { top: 110%; }
+        }
+        .glass-panel {
+            background: rgba(10, 15, 20, 0.85);
+            backdrop-filter: blur(4px);
+            border: 1px solid #2a2a2a;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+        }
+        .text-glow {
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+        }
+        .holo-glow {
+            text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #b8860b; border-radius: 2px; }
+    </style>
+</head>
+<body class="font-terminal min-h-screen bg-hex-pattern relative overflow-x-hidden selection:bg-imperial-gold selection:text-black">
+
+    <div class="scanline"></div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="max-w-2xl mx-auto p-4 md:p-6 flex flex-col gap-6 relative z-10">
+
+        <!-- HEADER: Identity & Status -->
+        <header class="glass-panel rounded-t-lg border-t-4 border-imperial-gold p-4 flex justify-between items-start">
+            <div>
+                <h1 class="font-header text-2xl md:text-3xl text-imperial-gold text-glow tracking-widest uppercase">Logos Imperium</h1>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span class="text-xs text-hologram-blue tracking-widest">CONN_ESTABLISHED // NICAEA-9</span>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-xs text-gray-500 uppercase">Current Date</div>
+                <div class="text-xl text-white font-bold">30,492 AD</div>
+            </div>
+        </header>
+
+        <!-- PROFILE SECTION: tbl_Players Data -->
+        <section class="glass-panel p-4 rounded border-l-2 border-imperial-gold">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+                <h2 class="text-imperial-gold font-bold uppercase tracking-wider">Citizen Identification</h2>
+                <span class="bg-gray-900 text-xs px-2 py-1 border border-gray-700 rounded text-gray-400">ID: A7-BETA-99</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <span class="block text-xs text-gray-500 uppercase mb-1">Name</span>
+                    <span class="text-lg text-white block">Strategos Alexios</span>
+                </div>
+                <div>
+                    <span class="block text-xs text-gray-500 uppercase mb-1">House Affiliation</span>
+                    <span class="text-lg text-hologram-blue block">Neo-Praetorians</span>
+                </div>
+                <div>
+                    <span class="block text-xs text-gray-500 uppercase mb-1">Current Location</span>
+                    <span class="text-white block flex items-center gap-2">
+                        <svg class="w-4 h-4 text-alert-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        The Chrysopolis (Sector 1)
+                    </span>
+                </div>
+                <div>
+                    <span class="block text-xs text-gray-500 uppercase mb-1">Social Credit</span>
+                    <span class="text-imperial-gold block font-bold">845 / 1000</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- STRESS TRACKS (Resistance System) -->
+        <!-- Based on Appendix 11.3: Blood, Mind, Silver, Shadow -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Blood (Physical) -->
+            <div class="glass-panel p-3 rounded border border-gray-800 relative overflow-hidden group">
+                <div class="absolute right-0 top-0 p-1 opacity-20 text-4xl font-header text-red-900 group-hover:opacity-40 transition">I</div>
+                <div class="flex justify-between text-xs mb-1">
+                    <span class="text-red-400 font-bold uppercase">Blood (Physical)</span>
+                    <span class="text-red-400">80%</span>
+                </div>
+                <div class="w-full bg-gray-900 h-2 rounded-full overflow-hidden">
+                    <div class="bg-red-600 h-full" style="width: 80%"></div>
+                </div>
+                <p class="text-[10px] text-gray-500 mt-1">Status: Minor Cybernetic Rejection</p>
+            </div>
+
+            <!-- Mind (Cognitive) -->
+            <div class="glass-panel p-3 rounded border border-gray-800 relative overflow-hidden group">
+                <div class="absolute right-0 top-0 p-1 opacity-20 text-4xl font-header text-blue-900 group-hover:opacity-40 transition">II</div>
+                <div class="flex justify-between text-xs mb-1">
+                    <span class="text-blue-400 font-bold uppercase">Mind (Cognitive)</span>
+                    <span class="text-blue-400">45%</span>
+                </div>
+                <div class="w-full bg-gray-900 h-2 rounded-full overflow-hidden">
+                    <div class="bg-blue-500 h-full" style="width: 45%"></div>
+                </div>
+                <p class="text-[10px] text-gray-500 mt-1">Warning: Logic Plague Detectable</p>
+            </div>
+
+            <!-- Silver (Financial) -->
+            <div class="glass-panel p-3 rounded border border-gray-800 relative overflow-hidden group">
+                <div class="absolute right-0 top-0 p-1 opacity-20 text-4xl font-header text-yellow-900 group-hover:opacity-40 transition">III</div>
+                <div class="flex justify-between text-xs mb-1">
+                    <span class="text-imperial-gold font-bold uppercase">Silver (Resource)</span>
+                    <span class="text-imperial-gold">1,250 ₵</span>
+                </div>
+                <div class="w-full bg-gray-900 h-2 rounded-full overflow-hidden">
+                    <div class="bg-imperial-gold h-full" style="width: 60%"></div>
+                </div>
+                <p class="text-[10px] text-gray-500 mt-1">Credit Standing: Solvent</p>
+            </div>
+
+            <!-- Shadow (Heat/Surveillance) -->
+            <div class="glass-panel p-3 rounded border border-gray-800 relative overflow-hidden group">
+                <div class="absolute right-0 top-0 p-1 opacity-20 text-4xl font-header text-purple-900 group-hover:opacity-40 transition">IV</div>
+                <div class="flex justify-between text-xs mb-1">
+                    <span class="text-purple-400 font-bold uppercase">Shadow (Heat)</span>
+                    <span class="text-purple-400">CRITICAL</span>
+                </div>
+                <div class="w-full bg-gray-900 h-2 rounded-full overflow-hidden">
+                    <div class="bg-purple-600 h-full animate-pulse" style="width: 90%"></div>
+                </div>
+                <p class="text-[10px] text-gray-500 mt-1">Alert: "The Edit" Imminent</p>
+            </div>
+        </section>
+
+        <!-- INVENTORY / ECONOMY (tbl_Economy) -->
+        <section class="glass-panel p-4 rounded">
+            <h3 class="text-xs text-gray-500 uppercase mb-3 border-b border-gray-800 pb-1">Asset Manifest</h3>
+            <div class="grid grid-cols-1 divide-y divide-gray-800 text-sm">
+                <div class="py-2 flex justify-between items-center hover:bg-gray-900 px-2 transition">
+                    <span class="text-white">Indulgences (Class A)</span>
+                    <span class="text-imperial-gold font-terminal">x 2</span>
+                </div>
+                <div class="py-2 flex justify-between items-center hover:bg-gray-900 px-2 transition">
+                    <span class="text-white">Adamantine Plating</span>
+                    <span class="text-imperial-gold font-terminal">x 50 kg</span>
+                </div>
+                <div class="py-2 flex justify-between items-center hover:bg-gray-900 px-2 transition">
+                    <span class="text-gray-400 italic">Raw Plasma</span>
+                    <span class="text-red-400 font-terminal">DEPLETED</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- TERMINAL: Action Input (Section 3.3 / 4.1 Interface) -->
+        <section class="glass-panel p-4 rounded border border-gray-700 bg-black">
+            <div class="flex items-center gap-2 mb-2">
+                <div class="w-2 h-2 bg-imperial-gold animate-blink"></div>
+                <h3 class="text-imperial-gold text-xs uppercase tracking-widest">Command Line Interface</h3>
+            </div>
+            
+            <!-- Log Output -->
+            <div id="terminal-log" class="h-32 overflow-y-auto font-terminal text-xs text-green-500 mb-3 p-2 border-l border-green-900 space-y-1">
+                <p class="opacity-50">> BOOT_SEQUENCE_INIT...</p>
+                <p class="opacity-50">> CONNECTING TO MANUS_CORE via MCP...</p>
+                <p class="opacity-50">> CONNECTION SECURE.</p>
+                <p class="opacity-50">> RETRIEVING SECTOR DATA: THRACE...</p>
+                <p class="text-white">> SYSTEM READY. AWAITING INPUT.</p>
+            </div>
+
+            <!-- Input Form -->
+            <form id="action-form" onsubmit="handleAction(event)" class="flex gap-2">
+                <input type="text" id="command-input" 
+                    class="flex-1 bg-gray-900 border border-gray-700 text-white font-terminal text-sm p-2 focus:outline-none focus:border-imperial-gold focus:ring-1 focus:ring-imperial-gold transition"
+                    placeholder="Enter command (e.g., 'Travel to The Mese', 'Bribe Guard')..." autocomplete="off">
+                <button type="submit" 
+                    class="bg-gold-dim hover:bg-imperial-gold text-black font-bold uppercase text-xs px-4 py-2 transition duration-300">
+                    Execute
+                </button>
+            </form>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="text-center text-[10px] text-gray-600 font-terminal">
+            <p>IMPERIAL ARCHIVE NODE 774-B // UNAUTHORIZED ACCESS IS HERESY</p>
+            <p>POWERED BY LOGOS (GOOGLE APPS SCRIPT RUNTIME)</p>
+        </footer>
+
+    </div>
+
+    <!-- CLIENT-SIDE LOGIC -->
+    <script>
+        // Mock function to simulate Apps Script 'google.script.run'
+        // In production, this connects to the backend described in Section 4.
+        function handleAction(e) {
+            e.preventDefault();
+            const input = document.getElementById('command-input');
+            const log = document.getElementById('terminal-log');
+            const cmd = input.value.trim();
+
+            if (!cmd) return;
+
+            // 1. Display User Command
+            const userEntry = document.createElement('p');
+            userEntry.className = "text-imperial-gold mt-2";
+            userEntry.textContent = `> USER: ${cmd}`;
+            log.appendChild(userEntry);
+
+            // 2. Simulate Processing (Loading State)
+            const processingEntry = document.createElement('p');
+            processingEntry.className = "text-hologram-blue opacity-75 animate-pulse";
+            processingEntry.textContent = "> PROCESSING [LOGOS_ENGINE]...";
+            log.appendChild(processingEntry);
+            
+            // Scroll to bottom
+            log.scrollTop = log.scrollHeight;
+            input.value = "";
+
+            // 3. Simulate Response (Gemini API / Apps Script return)
+            setTimeout(() => {
+                log.removeChild(processingEntry); // Remove loading text
+                
+                const responseEntry = document.createElement('p');
+                responseEntry.className = "text-white";
+                
+                // Simple keyword detection for demo purposes
+                if (cmd.toLowerCase().includes("travel")) {
+                    responseEntry.innerHTML = `> TRAVEL PROTOCOL INITIATED.<br>> Ticket purchased (-50 Credits).<br>> Arriving at destination in 1 Cycle.`;
+                } else if (cmd.toLowerCase().includes("indulgence")) {
+                    responseEntry.innerHTML = `> TRANSACTION COMPLETE.<br>> Sin absolved. Mind Stress reduced by 10%.<br>> The Church thanks you for your tithe.`;
+                } else {
+                    responseEntry.innerHTML = `> COMMAND ACKNOWLEDGED.<br>> Narrative log updated in Main Archive.<br>> Awaiting further instructions.`;
+                }
+                
+                log.appendChild(responseEntry);
+                log.scrollTop = log.scrollHeight;
+            }, 1500); // 1.5s simulated delay
+        }
+
+        // Glitch Effect Helper (Optional visual flair mentioned in Section 5.1)
+        setInterval(() => {
+            const title = document.querySelector('h1');
+            if (Math.random() > 0.95) {
+                title.style.textShadow = "2px 2px 0px #ff3333, -2px -2px 0px #00f3ff";
+                setTimeout(() => title.style.textShadow = "", 100);
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

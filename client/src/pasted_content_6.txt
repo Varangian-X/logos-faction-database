@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logos Imperium: Strategic Terminal [VERMILION]</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Rajdhani:wght@300;500;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Markdown Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+        /* Typography */
+        h1, h2, h3, .imperial-font { font-family: 'Cinzel', serif; }
+        body, p, li, .tech-font { font-family: 'Rajdhani', sans-serif; }
+        .data-font { font-family: 'Orbitron', sans-serif; }
+
+        /* Chart Containers */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #6A0DAD; border-radius: 2px; }
+
+        /* Visual Effects */
+        .neon-text-gold { text-shadow: 0 0 10px rgba(255, 215, 0, 0.6); }
+        .neon-text-cyan { text-shadow: 0 0 8px rgba(0, 240, 255, 0.6); }
+        .scanline {
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            position: absolute; inset: 0; z-index: 10; opacity: 0.1;
+        }
+        
+        /* Glassmorphism Panels */
+        .imperial-panel {
+            background: rgba(15, 15, 20, 0.9);
+            border: 1px solid #333;
+            border-top: 2px solid #6A0DAD; /* Imperial Purple */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        .varangian-panel { border-top: 2px solid #b91c1c; /* Blood Red */ }
+        .logothete-panel { border-top: 2px solid #FFD700; /* Gold */ }
+
+        /* The Warrant Card Style */
+        .warrant-card {
+            background-image: repeating-linear-gradient(45deg, #111 0px, #111 10px, #1a1a1a 10px, #1a1a1a 20px);
+            border: 2px solid #FFD700;
+            position: relative;
+        }
+
+        /* AI Chat Styles */
+        .chat-message {
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .user-message {
+            background-color: rgba(0, 240, 255, 0.1);
+            border-left: 2px solid #00F0FF;
+            color: #ccc;
+            text-align: right;
+        }
+        .logos-message {
+            background-color: rgba(106, 13, 173, 0.1);
+            border-left: 2px solid #6A0DAD;
+            color: #E2E8F0;
+            font-family: 'Cinzel', serif;
+        }
+        .typing-indicator::after {
+            content: '...';
+            animation: blink 1s infinite;
+        }
+        @keyframes blink { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+
+        /* Loader */
+        .loader {
+            border: 4px solid #333;
+            border-top: 4px solid #00F0FF;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Market Ticker Animations */
+        .price-up { color: #10B981; animation: flashGreen 1s; }
+        .price-down { color: #EF4444; animation: flashRed 1s; }
+        @keyframes flashGreen { 0% { background-color: rgba(16, 185, 129, 0.2); } 100% { background-color: transparent; } }
+        @keyframes flashRed { 0% { background-color: rgba(239, 68, 68, 0.2); } 100% { background-color: transparent; } }
+    </style>
+</head>
+<body class="bg-[#050505] text-gray-300 antialiased overflow-x-hidden relative">
+    
+    <!-- Scanline Overlay -->
+    <div class="scanline fixed h-full w-full"></div>
+
+    <!-- HEADER: The Divine Interface -->
+    <nav class="sticky top-0 w-full bg-black/95 border-b border-purple-900 z-50 px-6 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <div class="text-4xl text-yellow-500"><i class="fa-solid fa-place-of-worship"></i></div>
+            <div>
+                <h1 class="text-2xl text-white tracking-widest neon-text-gold">LOGOS <span class="text-purple-500">IMPERIUM</span></h1>
+                <div class="text-[10px] text-cyan-500 tracking-[0.3em] uppercase">Nomos Empsychos // The Living Law</div>
+            </div>
+        </div>
+        <div class="hidden md:flex items-center gap-4 text-right">
+            <button onclick="toggleChat()" class="px-4 py-2 bg-purple-900/30 border border-purple-500 text-purple-300 hover:bg-purple-900/50 transition rounded text-xs tracking-widest">
+                <i class="fa-solid fa-brain mr-2"></i>NEURAL UPLINK
+            </button>
+            <div>
+                <div class="text-xs text-gray-500">CURRENT CYCLE</div>
+                <div class="text-xl data-font text-purple-400">30,492 AD</div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-12 gap-6 relative z-20">
+
+        <!-- INTRO: The Warrant of Agency (Visual Flavor) -->
+        <div class="md:col-span-12 mb-4">
+            <div class="warrant-card p-6 rounded-none shadow-2xl flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="text-center md:text-left">
+                    <h2 class="text-xl font-bold text-yellow-500 mb-1 border-b border-yellow-700 inline-block">WARRANT OF AGENCY</h2>
+                    <p class="text-xs text-gray-400 mt-2 max-w-2xl">
+                        By decree of the <strong class="text-purple-400">Bureau of Barbarians</strong>: The bearer is granted <span class="text-cyan-400">Tier-2 Citizen Status</span>. Authorized to commit minor heresies, bypass local locks, and carry kinetic weaponry in pursuit of Imperial stability. Failure to maintain Leverage will result in immediate biomass recycling.
+                    </p>
+                </div>
+                <div class="flex gap-4 text-center">
+                    <div class="bg-black/80 border border-purple-500 p-2 min-w-[100px]">
+                        <div class="text-[10px] text-gray-500">LEVERAGE</div>
+                        <div class="text-2xl font-bold text-purple-400">74%</div>
+                    </div>
+                    <div class="bg-black/80 border border-red-500 p-2 min-w-[100px]">
+                        <div class="text-[10px] text-gray-500">HEAT</div>
+                        <div class="text-2xl font-bold text-red-500">CRITICAL</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODULE A: BUREAU OF BARBARIANS (MISSION & NPC GENERATION) -->
+        <div class="md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+            
+            <!-- A1: Mission Generator -->
+            <div class="imperial-panel p-6 rounded border-l-4 border-cyan-500">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-scroll mr-2 text-cyan-500"></i>MANDATE WEAVER</h3>
+                    <div class="text-[9px] text-gray-500 uppercase tracking-widest">Procedural Contract Generator</div>
+                </div>
+                
+                <div class="space-y-3">
+                    <select id="missionSystem" class="w-full bg-black border border-gray-700 text-gray-300 text-xs p-2 rounded focus:border-cyan-500 outline-none">
+                        <option value="New Roma (Throne)">New Roma (Throne)</option>
+                        <option value="Trebizond System">Trebizond System</option>
+                        <option value="The Ister Rim">The Ister Rim</option>
+                        <option value="Annwn (Fungal Moon)">Annwn (Fungal Moon)</option>
+                        <option value="Avalon Anomaly">Avalon Anomaly</option>
+                    </select>
+                    <select id="missionType" class="w-full bg-black border border-gray-700 text-gray-300 text-xs p-2 rounded focus:border-cyan-500 outline-none">
+                        <option value="Data Extraction">Data Extraction</option>
+                        <option value="Sanctioned Assassination">Sanctioned Assassination</option>
+                        <option value="Riot Suppression">Riot Suppression</option>
+                        <option value="Artifact Recovery">Artifact Recovery</option>
+                        <option value="Heresy Investigation">Heresy Investigation</option>
+                    </select>
+                    <button onclick="generateMission()" class="w-full bg-cyan-900/30 border border-cyan-500 text-cyan-400 hover:bg-cyan-800/50 hover:text-white p-2 rounded text-xs font-bold tracking-widest transition-all">
+                        ✨ DECRYPT MANDATE
+                    </button>
+                </div>
+
+                <!-- Mission Output Overlay -->
+                <div id="missionOverlay" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+                    <div class="bg-[#0a0a0f] border border-cyan-500 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg shadow-[0_0_50px_rgba(0,240,255,0.2)] p-6 relative">
+                        <button onclick="closeMissionOverlay()" class="absolute top-4 right-4 text-gray-500 hover:text-white"><i class="fa-solid fa-xmark fa-xl"></i></button>
+                        
+                        <div id="missionLoading" class="flex flex-col items-center justify-center py-10">
+                            <div class="loader mb-4"></div>
+                            <span class="text-cyan-500 animate-pulse text-sm">ACCESSING LOGOS ARCHIVES...</span>
+                        </div>
+
+                        <div id="missionResult" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="text-sm text-gray-300 font-mono space-y-4">
+                                <h2 class="text-xl font-bold text-cyan-400 border-b border-gray-700 pb-2">MANDATE DECRYPTED</h2>
+                                <div id="missionContent"></div>
+                                <button onclick="copyMissionText()" class="text-xs border border-gray-600 px-3 py-1 rounded hover:bg-gray-800 text-gray-400 transition">
+                                    <i class="fa-regular fa-copy mr-1"></i> COPY TEXT
+                                </button>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <div class="w-full aspect-square bg-black border border-gray-700 flex items-center justify-center overflow-hidden rounded">
+                                    <img id="missionImage" src="" class="w-full h-full object-cover hidden">
+                                </div>
+                                <button id="dlMissionBtn" onclick="downloadImage('missionImage')" class="hidden w-full text-center text-xs bg-cyan-900/40 border border-cyan-500 text-cyan-300 py-2 rounded hover:bg-cyan-800/50 transition">
+                                    <i class="fa-solid fa-download mr-1"></i> DOWNLOAD VISUAL
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- A2: NPC Architect (NEW) -->
+            <div class="imperial-panel p-6 rounded border-l-4 border-purple-500">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-user-secret mr-2 text-purple-500"></i>NPC ARCHITECT</h3>
+                    <div class="text-[9px] text-gray-500 uppercase tracking-widest">Identity Fabrication Protocol</div>
+                </div>
+
+                <div class="space-y-3">
+                    <select id="npcRole" class="w-full bg-black border border-gray-700 text-gray-300 text-xs p-2 rounded focus:border-purple-500 outline-none">
+                        <option value="Logothete (Bureaucrat)">Logothete (Bureaucrat)</option>
+                        <option value="Neo-Varangian Mercenary">Neo-Varangian Mercenary</option>
+                        <option value="Info-Broker">Info-Broker</option>
+                        <option value="Tech-Priest">Tech-Priest</option>
+                        <option value="Noble Scion">Noble Scion</option>
+                        <option value="Underworld Enforcer">Underworld Enforcer</option>
+                    </select>
+                    <select id="npcSystem" class="w-full bg-black border border-gray-700 text-gray-300 text-xs p-2 rounded focus:border-purple-500 outline-none">
+                        <option value="New Roma">New Roma (Core)</option>
+                        <option value="The Cisterns">The Cisterns (Slums)</option>
+                        <option value="Orbital Spire">Orbital Spire (Elite)</option>
+                        <option value="Frontier Outpost">Frontier Outpost</option>
+                    </select>
+                    <button onclick="generateNPC()" class="w-full bg-purple-900/30 border border-purple-500 text-purple-400 hover:bg-purple-800/50 hover:text-white p-2 rounded text-xs font-bold tracking-widest transition-all">
+                        ✨ COMPILE DOSSIER
+                    </button>
+                </div>
+
+                <!-- NPC Output Overlay -->
+                <div id="npcOverlay" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+                    <div class="bg-[#0a0a0f] border border-purple-500 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg shadow-[0_0_50px_rgba(106,13,173,0.3)] p-6 relative">
+                        <button onclick="closeNpcOverlay()" class="absolute top-4 right-4 text-gray-500 hover:text-white"><i class="fa-solid fa-xmark fa-xl"></i></button>
+                        
+                        <div id="npcLoading" class="flex flex-col items-center justify-center py-10">
+                            <div class="loader mb-4 border-t-purple-500"></div>
+                            <span class="text-purple-500 animate-pulse text-sm">FABRICATING IDENTITY...</span>
+                        </div>
+
+                        <div id="npcResult" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Mugshot Column -->
+                            <div class="md:col-span-1 flex flex-col gap-2">
+                                <div class="w-full aspect-[3/4] bg-black border border-gray-700 flex items-center justify-center overflow-hidden rounded relative">
+                                    <img id="npcImage" src="" class="w-full h-full object-cover hidden">
+                                    <div class="absolute bottom-0 w-full bg-black/60 text-[10px] text-center text-gray-400 py-1 backdrop-blur-sm">
+                                        ID: <span id="npcID">PENDING</span>
+                                    </div>
+                                </div>
+                                <button id="dlNpcBtn" onclick="downloadImage('npcImage')" class="hidden w-full text-center text-xs bg-purple-900/40 border border-purple-500 text-purple-300 py-2 rounded hover:bg-purple-800/50 transition">
+                                    <i class="fa-solid fa-download mr-1"></i> DOWNLOAD PORTRAIT
+                                </button>
+                            </div>
+(Content truncated due to size limit. Use page ranges or line ranges to read remaining content)
