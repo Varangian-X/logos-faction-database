@@ -70,7 +70,7 @@ export function CampaignBranching({ missions, onMissionSelect }: CampaignBranchi
                 mission.status === 'failed' ? 'text-red-400' :
                 'text-yellow-400'
               }`}>
-                {mission.status.toUpperCase()}
+                {mission.status ? mission.status.toUpperCase() : 'ACTIVE'}
               </div>
             </div>
           </div>
