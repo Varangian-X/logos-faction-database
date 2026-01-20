@@ -5,9 +5,15 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Trash2, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
 import { MissionOutcomeRecorder } from './MissionOutcomeRecorder';
+import { PredictivePlanner } from './PredictivePlanner';
+import { calculateCampaignState } from '@/lib/factionDynamics';
 
 export function CampaignLog() {
   const { savedScenarios, deleteScenario, updateScenarioStatus, updateScenarioNotes } = useCampaign();
+  const campaignState = useMemo(() => calculateCampaignState(savedScenarios), [savedScenarios]);
+  const factionReputation = useMemo(() => Object.fromEntries(
+    Object.entries(campaignState.factionStandings).map(([k, v]) => [k, v.reputation])
+  ), [campaignState]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed' | 'failed'>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -217,7 +223,10 @@ export function CampaignLog() {
 
               {/* Outcome Recorder for Active Missions */}
               {scenario.status === 'active' && (
-                <MissionOutcomeRecorder mission={scenario} />
+                <div className="space-y-4">
+                  <MissionOutcomeRecorder mission={scenario} />
+                  <PredictivePlanner mission={scenario} currentReputation={factionReputation} />
+                </div>
               )}
 
               {/* Show Branched Missions */}

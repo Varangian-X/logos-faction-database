@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Trash2, Download, FileJson, BarChart3, List, Upload, GitBranch, Clock, Network } from "lucide-react";
+import { ArrowLeft, Trash2, Download, FileJson, BarChart3, List, Upload, GitBranch, Clock, Network, Trophy } from "lucide-react";
 import { FileText } from "lucide-react";
 import { useCampaign } from "@/contexts/CampaignContext";
 import { Button } from "@/components/ui/button";
@@ -12,11 +12,19 @@ import { CampaignImport } from "@/components/CampaignImport";
 import { CampaignBranching } from "@/components/CampaignBranching";
 import { MissionTimeline } from "@/components/MissionTimeline";
 import { FactionRelationshipNetwork } from "@/components/FactionRelationshipNetwork";
+import { MilestoneTracker } from "@/components/MilestoneTracker";
+import { checkMilestones, CAMPAIGN_MILESTONES } from "@/lib/milestoneSystem";
+import { calculateCampaignState } from "@/lib/factionDynamics";
 
 export default function CampaignPage() {
   const { savedScenarios, clearCampaign } = useCampaign();
-  const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching' | 'timeline' | 'network'>('log');
+  const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching' | 'timeline' | 'network' | 'milestones'>('log');
   const [importOpen, setImportOpen] = useState(false);
+
+  const campaignState = calculateCampaignState(savedScenarios);
+  const milestones = checkMilestones(savedScenarios, Object.fromEntries(
+    Object.entries(campaignState.factionStandings).map(([k, v]) => [k, v.reputation])
+  ));
 
   return (
     <div className="h-screen w-full bg-[#050505] text-white overflow-hidden flex flex-col font-sans">
@@ -147,6 +155,17 @@ export default function CampaignPage() {
             <Network className="w-4 h-4 inline mr-2" />
             Factions
           </button>
+          <button
+            onClick={() => setActiveTab('milestones')}
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${
+              activeTab === 'milestones'
+                ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                : 'text-white/50 hover:text-white/70'
+            }`}
+          >
+            <Trophy className="w-4 h-4 inline mr-2" />
+            Milestones
+          </button>
         </div>
       )}
 
@@ -183,8 +202,10 @@ export default function CampaignPage() {
                 <CampaignBranching missions={savedScenarios} />
               ) : activeTab === 'timeline' ? (
                 <MissionTimeline missions={savedScenarios} />
-              ) : (
+              ) : activeTab === 'network' ? (
                 <FactionRelationshipNetwork missions={savedScenarios} />
+              ) : (
+                <MilestoneTracker milestones={milestones} />
               )}
             </div>
           </div>

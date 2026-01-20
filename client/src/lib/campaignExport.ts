@@ -322,6 +322,90 @@ export const exportCampaignToPDF = (scenarios: SavedScenario[]) => {
   doc.setTextColor(212, 175, 55);
   doc.setFont("times", "bold");
   doc.setFontSize(20);
+  doc.text("FACTION RELATIONSHIP NETWORK", pageWidth / 2, yPos, { align: "center" });
+  
+  if (relationshipMapImage) {
+    try {
+      doc.addImage(relationshipMapImage, 'PNG', margin, yPos + 20, pageWidth - (margin * 2), 150);
+    } catch (e) {
+      console.error("Failed to add relationship map image", e);
+    }
+  }
+  
+  doc.addPage();
+  yPos = margin;
+
+  // Timeline Visualization Page
+  doc.setFillColor(5, 5, 5);
+  doc.rect(0, 0, pageWidth, pageHeight, 'F');
+  
+  doc.setTextColor(212, 175, 55);
+  doc.setFont("times", "bold");
+  doc.setFontSize(20);
+  doc.text("CAMPAIGN TIMELINE", pageWidth / 2, yPos, { align: "center" });
+  yPos += 20;
+
+  // Draw timeline visualization manually since we can't easily capture the React component
+  const timelineStart = margin;
+  const timelineEnd = pageWidth - margin;
+  const timelineWidth = timelineEnd - timelineStart;
+  
+  // Group missions by year
+  const missionsByYear = new Map<number, SavedScenario[]>();
+  scenarios.forEach(s => {
+    if (!missionsByYear.has(s.year)) missionsByYear.set(s.year, []);
+    missionsByYear.get(s.year)!.push(s);
+  });
+  
+  const sortedYears = Array.from(missionsByYear.keys()).sort((a, b) => a - b);
+  
+  if (sortedYears.length > 0) {
+    const minYear = sortedYears[0];
+    const maxYear = sortedYears[sortedYears.length - 1];
+    const yearSpan = Math.max(1, maxYear - minYear);
+    
+    // Draw timeline axis
+    doc.setDrawColor(212, 175, 55);
+    doc.setLineWidth(0.5);
+    doc.line(timelineStart, yPos + 10, timelineEnd, yPos + 10);
+    
+    sortedYears.forEach(year => {
+      const xPos = timelineStart + ((year - minYear) / yearSpan) * timelineWidth;
+      
+      // Year marker
+      doc.line(xPos, yPos + 5, xPos, yPos + 15);
+      doc.setFontSize(10);
+      doc.setTextColor(212, 175, 55);
+      doc.text(year.toString(), xPos, yPos, { align: "center" });
+      
+      // Mission dots
+      const yearMissions = missionsByYear.get(year)!;
+      yearMissions.forEach((mission, idx) => {
+        const dotY = yPos + 20 + (idx * 8);
+        
+        // Status color
+        if (mission.status === 'completed') doc.setFillColor(100, 255, 100);
+        else if (mission.status === 'failed') doc.setFillColor(255, 100, 100);
+        else doc.setFillColor(255, 255, 100);
+        
+        doc.circle(xPos, dotY, 1.5, 'F');
+        
+        // Mission title (if space permits)
+        if (yearMissions.length <= 5 || idx % 2 === 0) {
+          doc.setFontSize(6);
+          doc.setTextColor(200, 200, 200);
+          const title = mission.title.length > 15 ? mission.title.substring(0, 12) + '...' : mission.title;
+          doc.text(title, xPos + 3, dotY + 1);
+        }
+      });
+    });
+    
+    yPos += 80;
+  }
+  
+  doc.setTextColor(212, 175, 55);
+  doc.setFont("times", "bold");
+  doc.setFontSize(20);
   doc.text("RELATIONSHIP MAP", pageWidth / 2, yPos, { align: "center" });
   
   doc.setFontSize(10);
