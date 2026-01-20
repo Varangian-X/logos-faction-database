@@ -14,12 +14,14 @@ import { MissionTimeline } from "@/components/MissionTimeline";
 import { FactionRelationshipNetwork } from "@/components/FactionRelationshipNetwork";
 import { MilestoneTracker } from "@/components/MilestoneTracker";
 import { CustomMilestoneCreator } from "@/components/CustomMilestoneCreator";
+import { FactionEconomyDashboard } from "@/components/FactionEconomyDashboard";
 import { checkMilestones, CAMPAIGN_MILESTONES, Milestone } from "@/lib/milestoneSystem";
 import { calculateCampaignState } from "@/lib/factionDynamics";
+import { Coins } from "lucide-react";
 
 export default function CampaignPage() {
   const { savedScenarios, clearCampaign } = useCampaign();
-  const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching' | 'timeline' | 'network' | 'milestones'>('log');
+  const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching' | 'timeline' | 'network' | 'milestones' | 'economy'>('log');
   const [importOpen, setImportOpen] = useState(false);
   const [customMilestones, setCustomMilestones] = useState<Milestone[]>([]);
 
@@ -172,6 +174,17 @@ export default function CampaignPage() {
             <Trophy className="w-4 h-4 inline mr-2" />
             Milestones
           </button>
+          <button
+            onClick={() => setActiveTab('economy')}
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${
+              activeTab === 'economy'
+                ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                : 'text-white/50 hover:text-white/70'
+            }`}
+          >
+            <Coins className="w-4 h-4 inline mr-2" />
+            Economy
+          </button>
         </div>
       )}
 
@@ -210,6 +223,8 @@ export default function CampaignPage() {
                 <MissionTimeline missions={savedScenarios} />
               ) : activeTab === 'network' ? (
                 <FactionRelationshipNetwork missions={savedScenarios} />
+              ) : activeTab === 'economy' ? (
+                <FactionEconomyDashboard factionStandings={campaignState.factionStandings} />
               ) : (
                 <div className="space-y-6">
                   <div className="flex justify-end">

@@ -1,4 +1,5 @@
 import { MapLocation } from "./mapData";
+import { FactionResources } from "./factionDynamics";
 
 export interface Scenario {
   id: string;
@@ -8,6 +9,7 @@ export interface Scenario {
   objectives: string[];
   complications: string[];
   rewards: string[];
+  resourceCost?: Partial<FactionResources>;
 }
 
 const missionTemplates = {
@@ -133,10 +135,31 @@ const missionTemplates = {
   ],
 };
 
-export function generateScenario(location: MapLocation, year: number): Scenario {
+export function generateScenario(location: MapLocation, year: number, factionResources?: FactionResources): Scenario | null {
   const alignment = location.alignment;
   const templates = missionTemplates[alignment] || missionTemplates["Neutral"];
-  const template = templates[Math.floor(Math.random() * templates.length)];
+  
+  // Filter templates based on resource availability
+  const availableTemplates = templates.filter(t => {
+    if (!factionResources) return true;
+    
+    // Define resource costs for mission types
+    const costs: Partial<FactionResources> = {};
+    if (t.type === 'Combat') costs.manpower = 10;
+    if (t.type === 'Espionage') costs.tech = 10;
+    if (t.type === 'Heist/Raid') costs.credits = 10;
+    
+    // Check if faction has enough resources
+    if (costs.manpower && factionResources.manpower < costs.manpower) return false;
+    if (costs.tech && factionResources.tech < costs.tech) return false;
+    if (costs.credits && factionResources.credits < costs.credits) return false;
+    
+    return true;
+  });
+
+  if (availableTemplates.length === 0) return null;
+
+  const template = availableTemplates[Math.floor(Math.random() * availableTemplates.length)];
   
   // Customize based on location and year
   const customizedDesc = template.desc.replace("Local authorities", location.controllingFaction);
@@ -157,6 +180,12 @@ export function generateScenario(location: MapLocation, year: number): Scenario 
     baseRewards[Math.floor(Math.random() * baseRewards.length)],
   ];
   
+  // Calculate resource cost
+  const resourceCost: Partial<FactionResources> = {};
+  if (template.type === 'Combat') resourceCost.manpower = 10;
+  if (template.type === 'Espionage') resourceCost.tech = 10;
+  if (template.type === 'Heist/Raid') resourceCost.credits = 10;
+
   return {
     id: Math.random().toString(36).substr(2, 9),
     title: template.title,
@@ -165,5 +194,6 @@ export function generateScenario(location: MapLocation, year: number): Scenario 
     objectives: template.obj,
     complications: [template.comp[Math.floor(Math.random() * template.comp.length)]],
     rewards: rewards,
+    resourceCost,
   };
 }

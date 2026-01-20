@@ -231,6 +231,21 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({
       let alignment = location.alignment;
       let strength = 100;
       
+      // Dynamic territory control based on faction influence
+      const controllingFaction = location.controllingFaction;
+      const factionStanding = campaignState.factionStandings[controllingFaction];
+      
+      if (factionStanding) {
+        // If faction influence is very high (>80), they project stronger control (larger node)
+        if (factionStanding.influence > 80) {
+          strength += 20;
+        }
+        // If faction is hostile and influence is low (<20), territory is contested (pulsing effect)
+        if (factionStanding.status === 'hostile' && factionStanding.influence < 20) {
+          strength -= 30;
+        }
+      }
+
       if (showTimeLapse && location.history) {
         const years = Object.keys(location.history).map(Number).sort((a, b) => a - b);
         let record = null;
@@ -255,7 +270,9 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({
               ? "#00E5FF"
               : "#888888";
 
-      const nodeSize = isSelected ? 12 : isHovered ? 10 : 8;
+      // Adjust node size based on strength/influence
+      const influenceModifier = (strength - 100) / 20; // +1 size for every +20 strength
+      const nodeSize = (isSelected ? 12 : isHovered ? 10 : 8) + Math.max(-2, influenceModifier);
 
       // Draw strength overlay
       if (showStrengthOverlay) {
