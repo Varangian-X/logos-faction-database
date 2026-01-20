@@ -19,7 +19,7 @@ import { PlayerAssetsManager } from "@/components/PlayerAssetsManager";
 import { SectorEventsPanel } from "@/components/SectorEventsPanel";
 import { checkMilestones, CAMPAIGN_MILESTONES, Milestone } from "@/lib/milestoneSystem";
 import { calculateCampaignState } from "@/lib/factionDynamics";
-import { Coins, Package, AlertTriangle, Zap, Handshake, Scroll, Anchor } from "lucide-react";
+import { Coins, Package, AlertTriangle, Zap, Handshake, Scroll, Anchor, Eye } from "lucide-react";
 import { PlayerAsset } from "@/lib/playerAssets";
 import { SectorEvent } from "@/lib/sectorWideEvents";
 import { FactionAIController } from "@/components/FactionAIController";
@@ -27,17 +27,22 @@ import { TechTreePanel } from "@/components/TechTreePanel";
 import { DiplomacyPanel } from "@/components/DiplomacyPanel";
 import { GovernancePanel } from "@/components/GovernancePanel";
 import { FleetPanel } from "@/components/FleetPanel";
+import { EspionagePanel } from "@/components/EspionagePanel";
+import { GovernorEventModal } from "@/components/GovernorEventModal";
+import { checkGovernorEvents, GovernorEvent } from "@/lib/governorEvents";
 import { TECH_TREE } from "@/lib/techTree";
 
 export default function CampaignPage() {
   const { savedScenarios, clearCampaign } = useCampaign();
-  const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching' | 'timeline' | 'network' | 'milestones' | 'economy' | 'assets' | 'events' | 'tech' | 'diplomacy' | 'governance' | 'fleet'>('log');
+  const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching' | 'timeline' | 'network' | 'milestones' | 'economy' | 'assets' | 'events' | 'tech' | 'diplomacy' | 'governance' | 'fleet' | 'espionage'>('log');
   const [importOpen, setImportOpen] = useState(false);
   const [customMilestones, setCustomMilestones] = useState<Milestone[]>([]);
   const [playerAssets, setPlayerAssets] = useState<PlayerAsset[]>([]);
   const [sectorEvents, setSectorEvents] = useState<SectorEvent[]>([]);
   const [techState, setTechState] = useState<{ unlockedTechs: string[]; researchProgress: Record<string, number> }>({ unlockedTechs: [], researchProgress: {} });
   const [techResources, setTechResources] = useState(500); // Starting tech points
+  const [activeGovernorEvent, setActiveGovernorEvent] = useState<GovernorEvent | null>(null);
+  const [governorEventOpen, setGovernorEventOpen] = useState(false);
 
   const campaignState = calculateCampaignState(savedScenarios);
   const milestones = checkMilestones(savedScenarios, Object.fromEntries(
@@ -118,6 +123,21 @@ export default function CampaignPage() {
 
       {/* Import Dialog */}
       <CampaignImport open={importOpen} onOpenChange={setImportOpen} />
+      
+      {/* Governor Event Modal */}
+      <GovernorEventModal 
+        open={governorEventOpen} 
+        onOpenChange={setGovernorEventOpen}
+        event={activeGovernorEvent}
+        onChoice={(choiceIdx) => {
+          if (activeGovernorEvent) {
+            const choice = activeGovernorEvent.choices[choiceIdx];
+            // Apply effect (mock implementation)
+            console.log("Applied effect:", choice.effectDescription);
+            setGovernorEventOpen(false);
+          }
+        }}
+      />
 
       {/* Tabs */}
       {savedScenarios.length > 0 && (
@@ -265,6 +285,17 @@ export default function CampaignPage() {
             <Anchor className="w-4 h-4 inline mr-2" />
             Fleet
           </button>
+          <button
+            onClick={() => setActiveTab('espionage')}
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${
+              activeTab === 'espionage'
+                ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                : 'text-white/50 hover:text-white/70'
+            }`}
+          >
+            <Eye className="w-4 h-4 inline mr-2" />
+            Espionage
+          </button>
         </div>
       )}
 
@@ -343,6 +374,8 @@ export default function CampaignPage() {
                 <GovernancePanel />
               ) : activeTab === 'fleet' ? (
                 <FleetPanel />
+              ) : activeTab === 'espionage' ? (
+                <EspionagePanel />
               ) : (
                 <div className="space-y-6">
                   <div className="flex justify-end">
