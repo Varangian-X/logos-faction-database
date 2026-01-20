@@ -15,15 +15,21 @@ import { FactionRelationshipNetwork } from "@/components/FactionRelationshipNetw
 import { MilestoneTracker } from "@/components/MilestoneTracker";
 import { CustomMilestoneCreator } from "@/components/CustomMilestoneCreator";
 import { FactionEconomyDashboard } from "@/components/FactionEconomyDashboard";
+import { PlayerAssetsManager } from "@/components/PlayerAssetsManager";
+import { SectorEventsPanel } from "@/components/SectorEventsPanel";
 import { checkMilestones, CAMPAIGN_MILESTONES, Milestone } from "@/lib/milestoneSystem";
 import { calculateCampaignState } from "@/lib/factionDynamics";
-import { Coins } from "lucide-react";
+import { Coins, Package, AlertTriangle } from "lucide-react";
+import { PlayerAsset } from "@/lib/playerAssets";
+import { SectorEvent } from "@/lib/sectorWideEvents";
 
 export default function CampaignPage() {
   const { savedScenarios, clearCampaign } = useCampaign();
-  const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching' | 'timeline' | 'network' | 'milestones' | 'economy'>('log');
+  const [activeTab, setActiveTab] = useState<'log' | 'stats' | 'branching' | 'timeline' | 'network' | 'milestones' | 'economy' | 'assets' | 'events'>('log');
   const [importOpen, setImportOpen] = useState(false);
   const [customMilestones, setCustomMilestones] = useState<Milestone[]>([]);
+  const [playerAssets, setPlayerAssets] = useState<PlayerAsset[]>([]);
+  const [sectorEvents, setSectorEvents] = useState<SectorEvent[]>([]);
 
   const campaignState = calculateCampaignState(savedScenarios);
   const milestones = checkMilestones(savedScenarios, Object.fromEntries(
@@ -185,6 +191,28 @@ export default function CampaignPage() {
             <Coins className="w-4 h-4 inline mr-2" />
             Economy
           </button>
+          <button
+            onClick={() => setActiveTab('assets')}
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${
+              activeTab === 'assets'
+                ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                : 'text-white/50 hover:text-white/70'
+            }`}
+          >
+            <Package className="w-4 h-4 inline mr-2" />
+            Assets
+          </button>
+          <button
+            onClick={() => setActiveTab('events')}
+            className={`py-3 px-4 font-mono text-xs uppercase tracking-widest transition-colors whitespace-nowrap ${
+              activeTab === 'events'
+                ? 'text-[#D4AF37] border-b-2 border-[#D4AF37]'
+                : 'text-white/50 hover:text-white/70'
+            }`}
+          >
+            <AlertTriangle className="w-4 h-4 inline mr-2" />
+            Events
+          </button>
         </div>
       )}
 
@@ -225,6 +253,17 @@ export default function CampaignPage() {
                 <FactionRelationshipNetwork missions={savedScenarios} />
               ) : activeTab === 'economy' ? (
                 <FactionEconomyDashboard factionStandings={campaignState.factionStandings} />
+              ) : activeTab === 'assets' ? (
+                <PlayerAssetsManager
+                  assets={playerAssets}
+                  onAddAsset={(asset) => setPlayerAssets(prev => [...prev, asset])}
+                  onUpgradeAsset={(id) => {
+                    // Upgrade logic would go here
+                  }}
+                  currentYear={30492}
+                />
+              ) : activeTab === 'events' ? (
+                <SectorEventsPanel events={sectorEvents} currentYear={30492} />
               ) : (
                 <div className="space-y-6">
                   <div className="flex justify-end">
