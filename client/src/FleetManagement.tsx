@@ -25,21 +25,42 @@ import {
 
 export default function FleetManagement() {
   const [, setLocation] = useLocation();
-  const { gameState, updateGameState, addShip } = useGameState();
+  const { gameState, setGameState, logResourceChange } = useGameState();
   const [selectedFleet, setSelectedFleet] = useState<number | null>(null);
   const [selectedTab, setSelectedTab] = useState('overview');
 
   const handleBuildShip = (shipType: any) => {
     if (gameState.credits >= shipType.cost) {
-      updateGameState({ credits: gameState.credits - shipType.cost });
-      addShip({
-        id: `ship-${Date.now()}`,
-        name: `${shipType.name} ${Math.floor(Math.random() * 1000)}`,
-        class: shipType.name.toLowerCase(),
-        experience: 0,
-        status: 'Ready'
+      const newCredits = gameState.credits - shipType.cost;
+      // Add ship to first fleet or create new fleet
+      setGameState(prev => {
+        const fleets = [...(prev.fleets || [])];
+        if (fleets.length === 0) {
+          // Create a new fleet with this ship
+          fleets.push({
+            id: `fleet-${Date.now()}`,
+            name: 'Alpha Squadron',
+            owner: 'player',
+            location: 'home_sector',
+            ships: [{ shipClassId: shipType.id || 'corvette_class', count: 1 }],
+            status: 'Idle' as const
+          });
+        } else {
+          // Add to first fleet
+          const existingShip = fleets[0].ships.find((s: any) => s.shipClassId === (shipType.id || 'corvette_class'));
+          if (existingShip) {
+            existingShip.count++;
+          } else {
+            fleets[0].ships.push({ shipClassId: shipType.id || 'corvette_class', count: 1 });
+          }
+        }
+        return {
+          ...prev,
+          credits: newCredits,
+          fleets
+        };
       });
-      // toast.success(`${shipType.name} construction started`);
+      logResourceChange('credits', -shipType.cost, newCredits, 'Ship Construction', `Built ${shipType.name}`);
     }
   };
 
@@ -104,7 +125,7 @@ export default function FleetManagement() {
           </div>
           
           <div className="text-right text-sm">
-            <p className="text-cyan-300 font-mono">Total Ships: {gameState.totalShips}</p>
+            <p className="text-cyan-300 font-mono">Total Ships: {gameState.fleets?.length || 0}</p>
             <p className="text-slate-400 text-xs">Credits: {gameState.credits.toLocaleString()}</p>
           </div>
         </div>

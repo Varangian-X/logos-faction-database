@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGameState } from '@/contexts/GameStateContext';
-import TechTree from '@/components/TechTree';
+import { TechTreePanel as TechTree } from '@/components/TechTreePanel';
 import { toast } from 'sonner';
 
 // Chart.js imports
@@ -52,7 +52,7 @@ ChartJS.register(
  */
 export default function IntelAnalytics() {
   const [, setLocation] = useLocation();
-  const { gameState, updateGameState } = useGameState();
+  const { gameState, setGameState, logResourceChange } = useGameState();
   const [activeTab, setActiveTab] = useState('hierarchy');
 
   // --- CHART CONFIGURATIONS ---
@@ -299,22 +299,20 @@ export default function IntelAnalytics() {
                     researchedTechs={gameState.researchedTechs || []}
                     // @ts-ignore
                     currentResearch={gameState.currentResearch}
-                    researchPoints={gameState.research || 0}
-                    onStartResearch={(techId, cost) => {
+                    researchPoints={gameState.tech}
+                    onStartResearch={(techId: string, cost: number) => {
                       // In a real implementation, this would start a timer or deduct points over time
-                      // For this demo, we'll instantly research if points are available
-                      if ((gameState.research || 0) >= cost) {
-                        // @ts-ignore
-                        const newResearched = [...(gameState.researchedTechs || []), techId];
-                        // @ts-ignore
-                        updateGameState({ 
-                          research: (gameState.research || 0) - cost,
-                          // @ts-ignore
-                          researchedTechs: newResearched
-                        });
+                      // For this demo, we'll use tech points from GameState
+                      if (gameState.tech >= cost) {
+                        const newTech = gameState.tech - cost;
+                        setGameState(prev => ({
+                          ...prev,
+                          tech: newTech
+                        }));
+                        logResourceChange('tech', -cost, newTech, 'Research', `Researched ${techId}`);
                         toast.success("Research Completed!");
                       } else {
-                        toast.error("Insufficient Research Points");
+                        toast.error("Insufficient Tech Points");
                       }
                     }}
                   />
@@ -328,7 +326,7 @@ export default function IntelAnalytics() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-center py-4">
-                      <p className="text-4xl font-bold text-cyan-400 font-mono">{gameState.research || 0}</p>
+                      <p className="text-4xl font-bold text-cyan-400 font-mono">{gameState.tech}</p>
                       <p className="text-xs text-slate-500 uppercase mt-1">Points Available</p>
                     </div>
                     <div className="space-y-2 mt-4 pt-4 border-t border-slate-800">

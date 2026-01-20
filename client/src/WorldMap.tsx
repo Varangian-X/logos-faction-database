@@ -15,24 +15,16 @@ import { toast } from 'sonner';
 
 export default function WorldMap() {
   const [, setLocation] = useLocation();
-  const { gameState, updateGameState } = useGameState();
+  const { gameState, setGameState, logResourceChange } = useGameState();
   const [selectedLocation, setSelectedLocation] = useState<any>(null);
   const [locations, setLocations] = useState<any[]>([]);
   const [isScanning, setIsScanning] = useState(false);
+  const [currentLocationId, setCurrentLocationId] = useState<string | null>(null);
 
-  // Initialize locations if not present
+  // Initialize locations
   useEffect(() => {
-    if (gameState.discoveredLocations && gameState.discoveredLocations.length > 0) {
-      // In a real app, we'd load these from state. For now, we'll regenerate them or use a stored list
-      // For this demo, let's generate a fresh cluster if empty, or use existing logic
-      if (locations.length === 0) {
-        const newLocations = generateLocationCluster(6, gameState);
-        setLocations(newLocations);
-      }
-    } else {
-      const newLocations = generateLocationCluster(6, gameState);
-      setLocations(newLocations);
-    }
+    const newLocations = generateLocationCluster(6, gameState);
+    setLocations(newLocations);
   }, []);
 
   const handleScan = () => {
@@ -42,7 +34,9 @@ export default function WorldMap() {
     }
 
     setIsScanning(true);
-    updateGameState({ energy: gameState.energy - 50 });
+    const newEnergy = gameState.energy - 50;
+    setGameState(prev => ({ ...prev, energy: newEnergy }));
+    logResourceChange('energy', -50, newEnergy, 'Sector Scan', 'Deep space scan initiated');
 
     setTimeout(() => {
       const newLocation = generateLocationCluster(1, gameState)[0];
@@ -58,19 +52,15 @@ export default function WorldMap() {
       return;
     }
 
-    updateGameState({ 
-      energy: gameState.energy - 20,
-      // @ts-ignore
-      currentLocation: location.id 
-    });
+    const newEnergy = gameState.energy - 20;
+    setGameState(prev => ({ ...prev, energy: newEnergy }));
+    logResourceChange('energy', -20, newEnergy, 'Fleet Travel', `Warped to ${location.name}`);
+    setCurrentLocationId(location.id);
     toast.success(`Fleet arrived at ${location.name}`);
   };
 
   const handleExplore = (location: any) => {
     // This represents the "Away Team" movement
-    // In a full implementation, this would transition to a local map or dungeon view
-    // For now, it triggers an event or combat encounter
-    
     const encounterChance = Math.random();
     
     if (encounterChance > 0.7) {
@@ -78,7 +68,9 @@ export default function WorldMap() {
       setTimeout(() => setLocation('/game/combat'), 1500);
     } else {
       const reward = Math.floor(Math.random() * 100) + 50;
-      updateGameState({ credits: gameState.credits + reward });
+      const newCredits = gameState.credits + reward;
+      setGameState(prev => ({ ...prev, credits: newCredits }));
+      logResourceChange('credits', reward, newCredits, 'Exploration', `Found resources at ${location.name}`);
       toast.success(`Exploration successful. Found ${reward} credits.`);
     }
   };
@@ -247,14 +239,12 @@ export default function WorldMap() {
                     <Button 
                       className="w-full bg-orange-600 hover:bg-orange-700"
                       onClick={() => handleExplore(selectedLocation)}
-                      // @ts-ignore
-                      disabled={gameState.currentLocation !== selectedLocation.id}
+                      disabled={currentLocationId !== selectedLocation.id}
                     >
                       <Flag className="w-4 h-4 mr-2" />
                       Deploy Away Team
                     </Button>
-                    {/* @ts-ignore */}
-                    {gameState.currentLocation !== selectedLocation.id && (
+                    {currentLocationId !== selectedLocation.id && (
                       <p className="text-xs text-center text-slate-500">Fleet must be in orbit to deploy team.</p>
                     )}
                   </div>

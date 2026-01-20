@@ -5,6 +5,7 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { GameStateProvider } from "./contexts/GameStateContext";
+import ResourceTicker from "./components/ResourceTicker";
 import MainMenu from "./pages/MainMenu";
 import GameHub from "./pages/GameHub";
 import EconomicDashboard from "./pages/EconomicDashboard";
@@ -49,6 +50,7 @@ function App() {
         <ThemeProvider defaultTheme="dark">
           <TooltipProvider>
             <Toaster />
+            <ResourceTicker />
             <Router />
           </TooltipProvider>
         </ThemeProvider>

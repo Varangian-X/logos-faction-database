@@ -32,14 +32,14 @@ export default function CharacterSheet() {
 
   // Mock character data
   const characterStats = {
-    name: gameState.playerName,
-    level: gameState.level,
-    experience: gameState.experience,
+    name: 'Commander',
+    level: 1,
+    experience: 0,
     nextLevelExp: 5000,
     health: 100,
     stress: gameState.stress,
     morale: 75,
-    reputation: gameState.reputation,
+    reputation: gameState.credits,
   };
 
   const skills = [

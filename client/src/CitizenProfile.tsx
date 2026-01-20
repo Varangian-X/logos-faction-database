@@ -89,7 +89,7 @@ const CitizenProfile = () => {
             </h1>
             <div className="flex items-center gap-2 mt-1">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              <span className="text-xs text-cyan-400 tracking-widest">CONN_ESTABLISHED // {gameState.playerHouse.toUpperCase()}</span>
+              <span className="text-xs text-cyan-400 tracking-widest">CONN_ESTABLISHED // HOUSE IMPERIUM</span>
             </div>
           </div>
         </div>
@@ -110,7 +110,7 @@ const CitizenProfile = () => {
                   <User className="h-4 w-4" /> Citizen Identification
                 </h2>
                 <Badge variant="outline" className="bg-gray-900 text-gray-400 border-gray-700 font-mono">
-                  ID: {gameState.playerId.toUpperCase()}
+                  ID: CITIZEN-001
                 </Badge>
               </div>
               
@@ -119,34 +119,34 @@ const CitizenProfile = () => {
                 <div className="flex justify-between items-end mb-2">
                   <div>
                     <span className="text-xs text-cyan-500 uppercase tracking-widest font-bold">Warrant of Agency</span>
-                    <div className="text-2xl text-white font-bold">Level {gameState.warrantLevel}</div>
+                    <div className="text-2xl text-white font-bold">Level 1</div>
                   </div>
                   <div className="text-right">
                     <span className="text-xs text-gray-500 uppercase">Clearance XP</span>
                     <div className="text-sm text-cyan-400 font-mono">
-                      {gameState.warrantXp} / {gameState.warrantNextLevelXp}
+                      0 / 1000
                     </div>
                   </div>
                 </div>
                 <Progress 
-                  value={(gameState.warrantXp / gameState.warrantNextLevelXp) * 100} 
+                  value={10} 
                   className="h-3 bg-gray-950 border border-gray-800" 
                   indicatorClassName="bg-cyan-500" 
                 />
                 <div className="mt-2 flex justify-between text-[10px] text-gray-500 uppercase tracking-wider">
-                  <span>Current Clearance: {gameState.warrantLevel === 1 ? 'Probationary' : gameState.warrantLevel === 2 ? 'Operative' : gameState.warrantLevel === 3 ? 'Agent' : 'Master Agent'}</span>
-                  <span>Next: {gameState.warrantLevel === 1 ? 'Operative' : gameState.warrantLevel === 2 ? 'Agent' : gameState.warrantLevel === 3 ? 'Master Agent' : 'Max Level'}</span>
+                  <span>Current Clearance: Probationary</span>
+                  <span>Next: Operative</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
                   <span className="block text-xs text-gray-500 uppercase mb-1">Name</span>
-                  <span className="text-xl text-white block font-bold">{gameState.playerName}</span>
+                  <span className="text-xl text-white block font-bold">Commander</span>
                 </div>
                 <div>
                   <span className="block text-xs text-gray-500 uppercase mb-1">House Affiliation</span>
-                  <span className="text-lg text-cyan-400 block">{gameState.playerHouse}</span>
+                  <span className="text-lg text-cyan-400 block">House Imperium</span>
                 </div>
                 <div>
                   <span className="block text-xs text-gray-500 uppercase mb-1">Current Location</span>
@@ -157,7 +157,7 @@ const CitizenProfile = () => {
                 </div>
                 <div>
                   <span className="block text-xs text-gray-500 uppercase mb-1">Social Credit</span>
-                  <span className="text-yellow-500 block font-bold text-xl">{gameState.reputation} / 1000</span>
+                  <span className="text-yellow-500 block font-bold text-xl">{gameState.credits} / 10000</span>
                 </div>
               </div>
             </CardContent>

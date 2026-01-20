@@ -46,7 +46,7 @@ export default function CharacterSkirmish() {
   
   // Mock combat state
   const [playerTeam, setPlayerTeam] = useState<Combatant[]>([
-    { id: 'p1', name: gameState.playerName, hp: 100, maxHp: 100, ap: 3, maxAp: 3, initiative: 10, isPlayer: true, class: 'Vanguard' },
+    { id: 'p1', name: 'Commander', hp: 100, maxHp: 100, ap: 3, maxAp: 3, initiative: 10, isPlayer: true, class: 'Vanguard' },
     { id: 'p2', name: 'Dr. Aris', hp: 80, maxHp: 80, ap: 3, maxAp: 3, initiative: 8, isPlayer: true, class: 'Medic' },
     { id: 'p3', name: 'Operative Kael', hp: 70, maxHp: 70, ap: 3, maxAp: 3, initiative: 9, isPlayer: true, class: 'Sniper' },
   ]);
@@ -385,7 +385,7 @@ export default function CharacterSkirmish() {
               <div className="flex justify-between items-start mb-2">
                 <div>
                   <h3 className="font-bold text-lg">{unit.name}</h3>
-                  <p className="text-xs text-slate-400">Level {gameState.level} Officer</p>
+                  <p className="text-xs text-slate-400">Level 1 Officer</p>
                 </div>
                 {unit.id === activeUnitId && <span className="text-xs bg-cyan-500/20 text-cyan-300 px-2 py-1 rounded">Active</span>}
               </div>

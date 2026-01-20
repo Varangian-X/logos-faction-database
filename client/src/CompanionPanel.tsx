@@ -108,7 +108,7 @@ export default function CompanionPanelPage() {
           </div>
           
           <div className="text-right text-sm">
-            <p className="text-purple-300 font-mono">Active: {gameState.companionCount}</p>
+            <p className="text-purple-300 font-mono">Active: 3</p>
             <p className="text-slate-400 text-xs">Credits: {gameState.credits.toLocaleString()}</p>
           </div>
         </div>

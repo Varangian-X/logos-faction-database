@@ -33,7 +33,22 @@ import { useGameState } from '@/contexts/GameStateContext';
 export default function GameHub() {
   const [, setLocation] = useLocation();
   const [selectedTab, setSelectedTab] = useState('overview');
-  const { gameState, saveGame, advanceTurn } = useGameState();
+  const { gameState, setGameState, logResourceChange } = useGameState();
+
+  const saveGame = () => {
+    localStorage.setItem('logos_imperium_save', JSON.stringify(gameState));
+  };
+
+  const advanceTurn = () => {
+    setGameState(prev => ({
+      ...prev,
+      turn: prev.turn + 1,
+      daysPassed: prev.daysPassed + 1,
+      credits: prev.credits + 100,
+      energy: Math.min(prev.energy + 50, 1000)
+    }));
+    logResourceChange('credits', 100, gameState.credits + 100, 'Turn Income', 'End of turn income');
+  };
 
   const systemHubs = [
     {
@@ -187,7 +202,7 @@ export default function GameHub() {
               <Card className="tech-panel border-cyan-500/30">
                 <div className="p-4">
                   <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">Fleet Size</p>
-                  <p className="text-3xl font-bold text-cyan-300 font-mono">{gameState.fleetSize}</p>
+                  <p className="text-3xl font-bold text-cyan-300 font-mono">{gameState.fleets?.length || 0}</p>
                   <p className="text-xs text-slate-500 mt-2">Ships under command</p>
                 </div>
               </Card>
@@ -196,7 +211,7 @@ export default function GameHub() {
               <Card className="tech-panel border-purple-500/30">
                 <div className="p-4">
                   <p className="text-xs uppercase tracking-widest text-slate-400 mb-2">Companions</p>
-                  <p className="text-3xl font-bold text-purple-300 font-mono">{gameState.companionCount}</p>
+                  <p className="text-3xl font-bold text-purple-300 font-mono">3</p>
                   <p className="text-xs text-slate-500 mt-2">Active advisors</p>
                 </div>
               </Card>
@@ -207,7 +222,13 @@ export default function GameHub() {
               <div className="p-6">
                 <h3 className="text-lg font-bold text-amber-300 mb-4 uppercase tracking-wider">Resources</h3>
                 <div className="grid grid-cols-3 gap-4">
-                  {Object.entries(gameState.resources).map(([key, value]) => (
+                  {[
+                    { key: 'Credits', value: gameState.credits },
+                    { key: 'Metal', value: gameState.metal },
+                    { key: 'Energy', value: gameState.energy },
+                    { key: 'Tech', value: gameState.tech },
+                    { key: 'Manpower', value: gameState.manpower }
+                  ].map(({ key, value }) => (
                     <div key={key} className="space-y-2">
                       <p className="text-xs uppercase text-slate-400 tracking-widest">{key}</p>
                       <div className="bg-slate-900 rounded-sm p-3 border border-slate-700">

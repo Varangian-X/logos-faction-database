@@ -18,7 +18,7 @@ import { useGameState } from '@/contexts/GameStateContext';
 
 export default function MainMenu() {
   const [, setLocation] = useLocation();
-  const { startNewGame } = useGameState();
+  const { setGameState } = useGameState();
   const [showNewGame, setShowNewGame] = useState(false);
   const [showLoadGame, setShowLoadGame] = useState(false);
   const [playerName, setPlayerName] = useState('');
@@ -26,7 +26,18 @@ export default function MainMenu() {
 
   const handleNewGame = () => {
     if (playerName.trim()) {
-      startNewGame(playerName, playerHouse);
+      // Reset game state for new game
+      setGameState(prev => ({
+        ...prev,
+        turn: 1,
+        daysPassed: 0,
+        credits: 1000,
+        metal: 500,
+        energy: 500,
+        tech: 100,
+        manpower: 200,
+        stress: 0,
+      }));
       setShowNewGame(false);
       setLocation('/game');
     }
