@@ -196,12 +196,46 @@ export const ImperialMap: React.FC<ImperialMapProps> = ({
       ctx.fillText(region.name, (screenMinX + screenMaxX) / 2, screenMinY + 20);
     });
 
-    // Draw locations
-    mapLocations.forEach(location => {
-      const screenX = location.x * zoom + pan.x;
-      const screenY = location.y * zoom + pan.y;
-      const isSelected = selectedLocation?.id === location.id;
-      const isHovered = hoveredLocation === location.id;
+      // Draw player assets
+      playerAssets.forEach(asset => {
+        const location = getLocationById(asset.location);
+        if (location) {
+          const screenX = location.x * zoom + pan.x;
+          const screenY = location.y * zoom + pan.y;
+          
+          // Draw asset icon base
+          ctx.beginPath();
+          ctx.arc(screenX + 15, screenY - 15, 8, 0, Math.PI * 2);
+          ctx.fillStyle = "#000000";
+          ctx.fill();
+          ctx.strokeStyle = asset.status === "Active" ? "#00FF00" : "#FF0000";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          // Draw asset type symbol
+          ctx.fillStyle = "#FFFFFF";
+          ctx.font = "10px Arial";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          const symbol = asset.type === "Mining Outpost" ? "⛏️" : 
+                        asset.type === "Research Lab" ? "🔬" :
+                        asset.type === "Trade Hub" ? "💰" :
+                        asset.type === "Military Base" ? "🛡️" : "🚀";
+          ctx.fillText(symbol, screenX + 15, screenY - 15);
+
+          // Draw level indicator
+          ctx.fillStyle = "#FFFFFF";
+          ctx.font = "8px Arial";
+          ctx.fillText(`L${asset.level}`, screenX + 15, screenY - 25);
+        }
+      });
+
+      // Draw locations
+      mapLocations.forEach(location => {
+        const screenX = location.x * zoom + pan.x;
+        const screenY = location.y * zoom + pan.y;
+        const isSelected = selectedLocation?.id === location.id;
+        const isHovered = hoveredLocation === location.id;
 
       // Draw connection lines to related locations
       if (isSelected || isHovered) {

@@ -22,6 +22,7 @@ import { calculateCampaignState } from "@/lib/factionDynamics";
 import { Coins, Package, AlertTriangle } from "lucide-react";
 import { PlayerAsset } from "@/lib/playerAssets";
 import { SectorEvent } from "@/lib/sectorWideEvents";
+import { FactionAIController } from "@/components/FactionAIController";
 
 export default function CampaignPage() {
   const { savedScenarios, clearCampaign } = useCampaign();
@@ -263,7 +264,10 @@ export default function CampaignPage() {
                   currentYear={30492}
                 />
               ) : activeTab === 'events' ? (
-                <SectorEventsPanel events={sectorEvents} currentYear={30492} />
+                <div className="space-y-6">
+                  <SectorEventsPanel events={sectorEvents} currentYear={30492} />
+                  <FactionAIController currentYear={30492} />
+                </div>
               ) : (
                 <div className="space-y-6">
                   <div className="flex justify-end">

@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Coins, Cpu, Users, TrendingUp, Zap, Building2, Plus } from 'lucide-react';
-import { PlayerAsset, calculateAssetNetProduction, assetTemplates } from '@/lib/playerAssets';
+import { PlayerAsset, calculateAssetNetProduction, assetTemplates, assetTierNames } from '@/lib/playerAssets';
 import { mapLocations } from '@/lib/mapData';
 
 interface PlayerAssetsManagerProps {
@@ -156,8 +156,8 @@ export function PlayerAssetsManager({
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h4 className="font-serif text-lg text-white">{asset.name}</h4>
-                      <p className="text-xs text-white/50">{asset.locationName}</p>
+                      <h4 className="font-serif text-lg text-white">{asset.tierName || asset.name}</h4>
+                      <p className="text-xs text-white/50">{asset.locationName} • {asset.type}</p>
                     </div>
                     <div className="flex gap-2">
                       <Badge variant="outline" className="text-white/70 border-white/20">
@@ -213,9 +213,10 @@ export function PlayerAssetsManager({
                       }}
                       disabled={asset.level >= 3}
                       className="text-xs"
+                      title={asset.level >= 3 ? "Max Level Reached" : `Upgrade to ${assetTierNames[asset.type][asset.level]}`}
                     >
                       <Zap className="w-3 h-3 mr-1" />
-                      Upgrade
+                      {asset.level >= 3 ? "Max Level" : "Upgrade"}
                     </Button>
                     <Button size="sm" variant="outline" className="text-xs flex-1">
                       Details

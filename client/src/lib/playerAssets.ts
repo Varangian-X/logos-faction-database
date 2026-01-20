@@ -10,6 +10,7 @@ export interface PlayerAsset {
   owner: string; // faction name
   purchasePrice: number;
   level: 1 | 2 | 3; // upgrade level
+  tierName: string; // e.g., "Outpost" -> "Station" -> "Fortress"
   productionRate: Partial<FactionResources>; // resources generated per year
   maintenanceCost: Partial<FactionResources>; // resources consumed per year
   acquisitionMethod: "Purchase" | "Capture" | "Inherit";
@@ -26,6 +27,7 @@ export const assetTemplates: Record<string, Omit<PlayerAsset, 'id' | 'owner' | '
     locationName: "",
     purchasePrice: 50,
     level: 1,
+    tierName: "Mining Outpost",
     productionRate: { credits: 15, tech: 0, manpower: 0 },
     maintenanceCost: { credits: 5, manpower: 3 },
     acquisitionMethod: "Purchase",
@@ -38,6 +40,7 @@ export const assetTemplates: Record<string, Omit<PlayerAsset, 'id' | 'owner' | '
     locationName: "",
     purchasePrice: 80,
     level: 1,
+    tierName: "Research Lab",
     productionRate: { credits: 5, tech: 20, manpower: 0 },
     maintenanceCost: { credits: 10, tech: 5 },
     acquisitionMethod: "Purchase",
@@ -50,6 +53,7 @@ export const assetTemplates: Record<string, Omit<PlayerAsset, 'id' | 'owner' | '
     locationName: "",
     purchasePrice: 60,
     level: 1,
+    tierName: "Trade Hub",
     productionRate: { credits: 25, tech: 0, manpower: 0 },
     maintenanceCost: { credits: 8, manpower: 2 },
     acquisitionMethod: "Purchase",
@@ -62,6 +66,7 @@ export const assetTemplates: Record<string, Omit<PlayerAsset, 'id' | 'owner' | '
     locationName: "",
     purchasePrice: 100,
     level: 1,
+    tierName: "Military Base",
     productionRate: { credits: 0, tech: 5, manpower: 20 },
     maintenanceCost: { credits: 15, manpower: 10 },
     acquisitionMethod: "Purchase",
@@ -74,6 +79,7 @@ export const assetTemplates: Record<string, Omit<PlayerAsset, 'id' | 'owner' | '
     locationName: "",
     purchasePrice: 120,
     level: 1,
+    tierName: "Spaceport",
     productionRate: { credits: 20, tech: 10, manpower: 5 },
     maintenanceCost: { credits: 12, tech: 3, manpower: 5 },
     acquisitionMethod: "Purchase",
@@ -99,6 +105,7 @@ export function createPlayerAsset(
     owner,
     purchasePrice: template.purchasePrice,
     level: 1,
+    tierName: template.name,
     productionRate: { ...template.productionRate },
     maintenanceCost: { ...template.maintenanceCost },
     acquisitionMethod,
@@ -108,13 +115,26 @@ export function createPlayerAsset(
   };
 }
 
+export const assetTierNames: Record<string, string[]> = {
+  "Mining Outpost": ["Mining Outpost", "Extraction Complex", "Planetary Harvester"],
+  "Research Lab": ["Research Lab", "Science Institute", "Techno-Arcology"],
+  "Trade Hub": ["Trade Hub", "Commerce Center", "Galactic Exchange"],
+  "Military Base": ["Military Base", "Fortress", "Citadel"],
+  "Spaceport": ["Spaceport", "Orbital Dock", "Star Fortress"],
+};
+
 export function upgradeAsset(asset: PlayerAsset): PlayerAsset {
   if (asset.level >= 3) return asset;
 
-  const upgraded = { ...asset, level: (asset.level + 1) as 1 | 2 | 3 };
+  const newLevel = (asset.level + 1) as 1 | 2 | 3;
+  const upgraded = { 
+    ...asset, 
+    level: newLevel,
+    tierName: assetTierNames[asset.type][newLevel - 1]
+  };
 
   // Increase production by 50% per level
-  const multiplier = 1 + asset.level * 0.5;
+  const multiplier = 1.5;
   upgraded.productionRate = {
     credits: asset.productionRate.credits ? Math.floor(asset.productionRate.credits * multiplier) : 0,
     tech: asset.productionRate.tech ? Math.floor(asset.productionRate.tech * multiplier) : 0,
@@ -122,7 +142,7 @@ export function upgradeAsset(asset: PlayerAsset): PlayerAsset {
   };
 
   // Increase maintenance by 25% per level
-  const maintenanceMultiplier = 1 + (asset.level - 1) * 0.25;
+  const maintenanceMultiplier = 1.25;
   upgraded.maintenanceCost = {
     credits: asset.maintenanceCost.credits ? Math.floor(asset.maintenanceCost.credits * maintenanceMultiplier) : 0,
     tech: asset.maintenanceCost.tech ? Math.floor(asset.maintenanceCost.tech * maintenanceMultiplier) : 0,
