@@ -248,6 +248,7 @@ export default function Home() {
           <a href="/network" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">NETWORK VIEW</a>
           <a href="/timeline" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">TIMELINE</a>
           <a href="/map" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">IMPERIAL MAP</a>
+          <a href="/gm-dashboard" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">GM DASHBOARD</a>
           <a href="/campaign" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">CAMPAIGN LOG</a>
         </div>
       </header>

@@ -10,6 +10,7 @@ import Network from "./pages/Network";
 import Timeline from "./pages/Timeline";
 import Map from "./pages/Map";
 import Campaign from "./pages/Campaign";
+import GMDashboard from "./pages/GMDashboard";
 
 function Router() {
   return (
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/timeline" component={Timeline} />
       <Route path="/map" component={Map} />
       <Route path="/campaign" component={Campaign} />
+      <Route path="/gm-dashboard" component={GMDashboard} />
       <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
