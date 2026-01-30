@@ -52,3 +52,47 @@ All core gameplay systems implemented and ready for player testing:
 ✅ Market Integration API (marketIntegration.ts)
 
 Ready for Dynamic Market module integration when complete.
+
+## Dynamic Market Module Development
+
+### Phase 1: Market Item Catalog
+- [x] Define item categories (weapons, ships, resources, tech)
+- [x] Assign faction affiliations to items
+- [x] Set base prices and rarity tiers
+- [x] Add item descriptions and metadata
+
+### Phase 2: Dynamic Market UI
+- [x] Create market interface component
+- [x] Display items with faction badges
+- [x] Show price breakdowns (base, discount, conflict, pendulum)
+- [x] Add filtering by category and faction
+
+### Phase 3: Faction Pricing Integration
+- [x] Integrate calculateFactionPriceModifiers()
+- [x] Show availability locks for hostile factions
+- [x] Display exclusive items for allied factions
+- [x] Add real-time price updates based on Byzantine Pendulum
+
+### Phase 4: Transaction System
+- [x] Implement shopping cart
+- [x] Add purchase confirmation with faction impact preview
+- [x] Track player credits/resources
+- [ ] Generate transaction history (future enhancement)
+
+### Phase 5: Testing & Polish
+- [x] Test all pricing scenarios
+- [x] Verify faction relationship effects
+- [x] Test Byzantine Pendulum volatility
+- [x] Save final checkpoint
+
+## Dynamic Market Complete
+
+Fully functional faction-driven market with:
+✅ 20+ items across 5 categories (weapons, ships, resources, technology, equipment)
+✅ Faction-specific items with alliance requirements
+✅ Real-time price modifiers based on player faction standings
+✅ Byzantine Pendulum market volatility
+✅ Shopping cart with transaction validation
+✅ Availability locks for hostile factions
+✅ Exclusive items for allied factions
+✅ Complete price breakdown UI showing all modifiers
