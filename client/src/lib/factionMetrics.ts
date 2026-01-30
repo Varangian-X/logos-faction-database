@@ -3,10 +3,12 @@
  * Calculates Military Strength, Economic Power, and Political Influence for all factions
  */
 
+export type FactionAlignment = 'Stasis' | 'Plasticity' | 'Neutral';
+
 export interface FactionMetrics {
   factionId: string;
   factionName: string;
-  alignment: 'Stasis' | 'Plasticity' | 'Neutral';
+  alignment: FactionAlignment;
   militaryStrength: number;
   economicPower: number;
   politicalInfluence: number;

@@ -11,6 +11,7 @@ import Timeline from "./pages/Timeline";
 import Map from "./pages/Map";
 import Campaign from "./pages/Campaign";
 import GMDashboard from "./pages/GMDashboard";
+import FactionIntelligence from "./pages/FactionIntelligence";
 
 function Router() {
   return (
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/map" component={Map} />
       <Route path="/campaign" component={Campaign} />
       <Route path="/gm-dashboard" component={GMDashboard} />
+      <Route path="/faction-intelligence" component={FactionIntelligence} />
       <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

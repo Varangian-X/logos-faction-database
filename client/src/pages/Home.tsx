@@ -249,6 +249,7 @@ export default function Home() {
           <a href="/timeline" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">TIMELINE</a>
           <a href="/map" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">IMPERIAL MAP</a>
           <a href="/gm-dashboard" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">GM DASHBOARD</a>
+          <a href="/faction-intelligence" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">FACTION INTELLIGENCE</a>
           <a href="/campaign" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">CAMPAIGN LOG</a>
         </div>
       </header>
