@@ -44,7 +44,7 @@ export const factions: Faction[] = [
     keyDetails: ["Sentient networked consciousness", "Nomos Empsychos", "Kathisma Interface", "Post-scarcity entity", "Controls Divine Algorithm"],
     sources: ["Registry", "Protagonists", "MASTER DOC"],
     allies: ["High Logothetes", "Neo-Praetorians", "Ecclesiarchy"],
-    imageUrl: "/images/stasis-banner.jpg"
+    imageUrl: "/manus-storage/stasis-banner_af6625c2.jpg"
   },
   {
     id: "sidhe",
@@ -81,7 +81,7 @@ export const factions: Faction[] = [
     sources: ["Registry", "Primer", "MASTER DOC", "Protagonists"],
     allies: ["Digital Divine Emperor", "High Logothetes"],
     enemies: ["Neo-Varangians", "Brethren of the Broken Code"],
-    imageUrl: "/images/stasis-banner.jpg"
+    imageUrl: "/manus-storage/stasis-banner_af6625c2.jpg"
   },
   {
     id: "neo-varangians",
@@ -94,7 +94,7 @@ export const factions: Faction[] = [
     sources: ["Registry", "Primer", "MASTER DOC", "Protagonists"],
     allies: ["Scrinium Barbarorum"],
     enemies: ["Neo-Praetorians"],
-    imageUrl: "/images/plasticity-banner.jpg"
+    imageUrl: "/manus-storage/plasticity-banner_7a201a92.jpg"
   },
   {
     id: "agentes",

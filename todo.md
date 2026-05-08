@@ -96,3 +96,21 @@ Fully functional faction-driven market with:
 ✅ Availability locks for hostile factions
 ✅ Exclusive items for allied factions
 ✅ Complete price breakdown UI showing all modifiers
+
+
+## Cartography Integration
+
+- [x] Copy Cartography HTML to webdev public folder
+- [x] Create Cartography.tsx page component with iframe
+- [x] Add /cartography route to App.tsx
+- [x] Add CARTOGRAPHY navigation link to Home.tsx header
+- [x] Test Cartography functionality (all 92 nodes, 15 assets displaying correctly)
+- [x] Verify identical functionality to standalone version
+
+### Cartography Integration Complete
+
+✅ Cartography app fully integrated into webdev project
+✅ Accessible via /cartography route
+✅ All UI controls functional (search, filters, asset roster, regional survey, etc.)
+✅ Navigation link added to main header
+✅ Ready for deployment to logosdb.club domain

@@ -72,13 +72,13 @@ const DetailPanel = ({ faction, onClose, onExport }: { faction: Faction; onClose
     >
       {/* Background Texture */}
       <div className="absolute inset-0 opacity-10 pointer-events-none" 
-           style={{ backgroundImage: 'url("/images/faction-card-bg.jpg")', backgroundSize: 'cover' }} />
+           style={{ backgroundImage: 'url("/manus-storage/faction-card-bg_eace883f.jpg")', backgroundSize: 'cover' }} />
       
       {/* Header Image */}
       <div className="h-48 w-full relative shrink-0">
         <div className="absolute inset-0 bg-gradient-to-t from-[#0A0E17] to-transparent z-10" />
         <img 
-          src={faction.imageUrl || "/images/faction-card-bg.jpg"} 
+          src={faction.imageUrl || "/manus-storage/faction-card-bg_eace883f.jpg"} 
           alt={faction.name}
           className="w-full h-full object-cover opacity-80"
         />
@@ -222,7 +222,7 @@ export default function Home() {
     <div className="h-screen w-full bg-[#050505] text-white overflow-hidden flex flex-col font-sans selection:bg-[#D4AF37] selection:text-black">
       {/* Background Elements */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[url('/images/hero-bg.jpg')] bg-cover bg-center opacity-20 mix-blend-overlay" />
+        <div className="absolute inset-0 bg-[url('/manus-storage/hero-bg_b95078e4.jpg')] bg-cover bg-center opacity-20 mix-blend-overlay" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-[1] bg-[length:100%_2px,3px_100%] pointer-events-none" />
       </div>
@@ -231,7 +231,7 @@ export default function Home() {
       <header className="relative z-20 border-b border-white/10 bg-black/60 backdrop-blur-md px-6 py-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37] flex items-center justify-center">
-            <img src="/images/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
+            <img src="/manus-storage/logo_da94a7c2.png" alt="Logo" className="w-8 h-8 object-contain" />
           </div>
           <div>
             <h1 className="text-xl font-serif tracking-widest text-[#D4AF37]">LOGOS IMPERIUM</h1>
@@ -252,6 +252,7 @@ export default function Home() {
           <a href="/faction-intelligence" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">FACTION INTELLIGENCE</a>
           <a href="/market" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">DYNAMIC MARKET</a>
           <a href="/campaign" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">CAMPAIGN LOG</a>
+          <a href="/cartography" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">CARTOGRAPHY</a>
         </div>
       </header>
 
