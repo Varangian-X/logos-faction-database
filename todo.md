@@ -106,6 +106,8 @@ Fully functional faction-driven market with:
 - [x] Add CARTOGRAPHY navigation link to Home.tsx header
 - [x] Test Cartography functionality (all 92 nodes, 15 assets displaying correctly)
 - [x] Verify identical functionality to standalone version
+- [x] Add prominent back button to Cartography page
+- [x] Test back button navigation (returns to Faction Tracker home)
 
 ### Cartography Integration Complete
 
@@ -113,4 +115,6 @@ Fully functional faction-driven market with:
 ✅ Accessible via /cartography route
 ✅ All UI controls functional (search, filters, asset roster, regional survey, etc.)
 ✅ Navigation link added to main header
+✅ Prominent "BACK TO TRACKER" button in top-left corner
+✅ Back button fully functional - returns to Faction Tracker home
 ✅ Ready for deployment to logosdb.club domain

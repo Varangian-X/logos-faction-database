@@ -1,0 +1,44 @@
+{
+  "build_command": "pnpm run build",
+  "capabilities": [
+    "db",
+    "server",
+    "user"
+  ],
+  "dev_command": "pnpm run dev",
+  "env_vars": {
+    "DATABASE_URL": "mysql://2jkm5RYg5d7odWY.b13b1112b737:EThnv2FYC3HmV99Sr4C1@gateway02.us-east-1.prod.aws.tidbcloud.com:4000/Vinge4vN3gAZ4pwMWT2RsR?ssl={\"rejectUnauthorized\":true}"
+  },
+  "experiments": null,
+  "git_remote": {
+    "repo_url": "s3://vida-prod-gitrepo/webdev-git/310519663267481133/Vinge4vN3gAZ4pwMWT2RsR",
+    "access_key_id": "ASIAZV3A2ECZIE2XKBPG",
+    "secret_access_key": "GR+obo1AEvGfaaBPmbUxt+o2tLtQqmKM1wo5zv0n",
+    "session_token": "IQoJb3JpZ2luX2VjECEaCXVzLWVhc3QtMSJIMEYCIQDPFPZO8SCWnpYm0USTx7IXW2XYFBdEdQ9ZwxSnlSz8qgIhAPk6vp25VVjoNkUxMy7g3brCjg0fk6ermldmVVzn1/+YKv8DCOn//////////wEQBBoMNjY1Mzg2MDk4ODY2IgxUclhaqj4qFbNV/4gq0wNbMgBcmT3tJxxzwIVsYq/9onV5FpZjCZ0bzEAfZ/ynjzUE3kks9khf5qvm6NJQRWdiN8yh380R804kWRCceQJAcDJEGC99fR//MuFJTq0UeiMqs8T9UVAEPMx+32Z0BpT75PeBWQ5HCe3AwF0mLlpJ8kNElBj2KiaJfzS5jjZ+1hvRqkeJYUa1SUP2/VnUMOZteoFiUvhIepDaAtlAbwKY3l+0wulYTsPqSYqUJ4qvwHu9C/5/LTR9SrFOZTlye62p7RzcstqvdQ35NbHVwU10BqAjy05FPVi75dQ6ps7jQchFQf1IHnoA6jytRLBJls8vtLIyhGLdxA7fNjD6hTIft3cdrWyxU7yhWxKvPJlvSnK07S9GuB0NadQg6hKSuGb7QHlK1dJ6I5KRlv1Y/dt+CePAjo3fJIKoZ1SKb1SJOc4ARhfM1Sjk0k+/Shjwd8FWb2mKMQ53DzL1N6wDgGskj6lNZphykwe/rsbCdWUx02oW//sGG0RG9VDmcUMjqfbN8RFVvgpJxMpsh0pfv9EYG/xhJjAQLs7EBYXUoE0DQ3ncRWB/Glp/g9bVT/JmMpp9bJw2EeDQqciIADg9akWSrn1oSMco5eJnoqLoAhii4BykJzC+3LXQBjqcAbd3jCYmmV3+LvFnWumD3YSW2bQzvBDcqgL3O9qtSxkt5UZkCt/F2rYc8TUn693dsighAGZK/9LcaqXq14oqDoiz+mL8aH1pH4o4yEz/Y4DWWKhwWcj88Y+bL8YShHLB2X1kkYynzRRYEd3NSOADowA6WRejcrACPcZ0NP4uzanqnEILfe/h6vYV2zGuix1qfS5q+HUZf2JdP9SWfQ==",
+    "expiration": "2026-05-20T20:18:06.000Z"
+  },
+  "name": "logos-faction-database",
+  "path": "/home/ubuntu/logos-faction-database",
+  "port": 3000,
+  "secrets": {
+    "BUILT_IN_FORGE_API_KEY": "HYowcc5w3wLEZnCZ9vhQjh",
+    "BUILT_IN_FORGE_API_URL": "https://forge.manus.ai",
+    "CLOUD_PW": "XS7DXbjcuNsxKWJ5nxnQsD",
+    "JWT_SECRET": "6jxgUf9kMvUJeMe8hV9NNe",
+    "OAUTH_SERVER_URL": "https://api.manus.im",
+    "OWNER_NAME": "Luke ap-Rhys",
+    "OWNER_OPEN_ID": "Akj6ykRHJqaf6GHzv4LtFE",
+    "SSH_COMM": "sshubuntu@104.196.189.31",
+    "VITE_ANALYTICS_ENDPOINT": "https://manus-analytics.com",
+    "VITE_ANALYTICS_WEBSITE_ID": "5139170b-ea6c-4472-acc7-b6e184dc2877",
+    "VITE_APP_ID": "Vinge4vN3gAZ4pwMWT2RsR",
+    "VITE_APP_LOGO": "https://files.manuscdn.com/user_upload_by_module/web_dev_logo/310519663267481133/qpoQFoyUmcSupJAN.png",
+    "VITE_APP_TITLE": "Logos Imperium Faction Database",
+    "VITE_FRONTEND_FORGE_API_KEY": "gGVJtrnUEi4uF86cFwYemd",
+    "VITE_FRONTEND_FORGE_API_URL": "https://forge.manus.ai",
+    "VITE_OAUTH_PORTAL_URL": "https://manus.im",
+    "secretstaiky": "AIzaSyCl5pjtlAHQqH-DMz3P4qAWqigpZv6o-2M"
+  },
+  "template_id": "web-db-user",
+  "test_command": "pnpm test"
+}
