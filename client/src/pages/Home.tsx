@@ -253,6 +253,7 @@ export default function Home() {
           <a href="/market" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">DYNAMIC MARKET</a>
           <a href="/campaign" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">CAMPAIGN LOG</a>
           <a href="/cartography" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">CARTOGRAPHY</a>
+          <a href="/ledger" className="text-[#D4AF37] hover:text-[#D4AF37]/80 transition-colors">IMPERIAL LEDGER</a>
         </div>
       </header>
 

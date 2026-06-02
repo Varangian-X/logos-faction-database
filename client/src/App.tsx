@@ -14,6 +14,7 @@ import GMDashboard from "./pages/GMDashboard";
 import FactionIntelligence from "./pages/FactionIntelligence";
 import DynamicMarket from "./pages/DynamicMarket";
 import Cartography from "./pages/Cartography";
+import ImperialLedger from "./pages/ImperialLedger";
 
 function Router() {
   return (
@@ -27,6 +28,7 @@ function Router() {
       <Route path="/faction-intelligence" component={FactionIntelligence} />
       <Route path="/market" component={DynamicMarket} />
       <Route path="/cartography" component={Cartography} />
+      <Route path="/ledger" component={ImperialLedger} />
       <Route path="/404" component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

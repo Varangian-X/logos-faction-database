@@ -284,3 +284,106 @@ Fully functional faction-driven market with:
 ✅ 24 comprehensive vitest tests (100% passing)
 ✅ Connect Notion button functional in UI
 ✅ Ready for live Notion data sync
+
+
+## Imperial Ledger - Live Market Ticker Dashboard
+
+### Phase 1: Page Component & Layout
+- [ ] Create ImperialLedger.tsx page component
+- [ ] Design market ticker grid layout (24+ resource cards)
+- [ ] Add header with cycle counter and LIVE indicator
+- [ ] Implement tab navigation (MARKETS, TRADE ROUTES, TREASURIES, ANOMALIES)
+- [ ] Style with Logos Imperium aesthetic (gold/black/cyan)
+
+### Phase 2: Notion Data Integration
+- [ ] Fetch all resources from Notion Resources database
+- [ ] Map resource data to price ticker format
+- [ ] Implement price history tracking (last 24 data points)
+- [ ] Add real-time price update simulation
+- [ ] Cache data with 5-minute refresh
+
+### Phase 3: Line Graph Components
+- [ ] Install Recharts for chart rendering
+- [ ] Create reusable PriceChart component
+- [ ] Implement animated line graphs with color coding
+- [ ] Add trend indicators (up/down arrows)
+- [ ] Display percentage change and CTRL status bar
+
+### Phase 4: Market Indicators
+- [ ] Add current price display with color coding
+- [ ] Implement percentage change calculations
+- [ ] Create supply/demand indicators
+- [ ] Add CTRL (Control Level) status bars
+- [ ] Implement real-time price volatility
+
+### Phase 5: Navigation & Integration
+- [ ] Add IMPERIAL LEDGER link to main navigation
+- [ ] Create route /ledger in App.tsx
+- [ ] Add back button to return to main menu
+- [ ] Test all navigation flows
+
+### Phase 6: Testing & Deployment
+- [ ] Write vitest tests for price calculations
+- [ ] Test Notion data fetching
+- [ ] Test chart rendering
+- [ ] Verify responsive design
+- [ ] Create checkpoint and deploy
+
+
+### Phase 1: Page Component & Layout
+- [x] Create ImperialLedger.tsx page component
+- [x] Design market ticker grid layout (4+ resource cards visible)
+- [x] Add header with cycle counter and LIVE indicator
+- [x] Implement tab navigation (MARKETS, TRADE ROUTES, TREASURIES, ANOMALIES)
+- [x] Style with Logos Imperium aesthetic (gold/black/cyan)
+
+### Phase 2: Notion Data Integration
+- [x] Create notionLedger.ts service for fetching resources
+- [x] Map resource data to price ticker format
+- [x] Implement price history tracking (24 data points)
+- [x] Add real-time price update simulation
+- [x] Cache data with 5-minute refresh
+
+### Phase 3: Line Graph Components
+- [x] Use Recharts for chart rendering
+- [x] Implement animated line graphs with color coding
+- [x] Add trend indicators (up/down arrows)
+- [x] Display percentage change and CTRL status bar
+- [x] Responsive chart sizing
+
+### Phase 4: Market Indicators
+- [x] Add current price display with color coding
+- [x] Implement percentage change calculations
+- [x] Create supply/demand level tracking
+- [x] Add CTRL (Control Level) status bars
+- [x] Implement real-time price volatility
+
+### Phase 5: Navigation & Integration
+- [x] Add IMPERIAL LEDGER link to main navigation
+- [x] Create route /ledger in App.tsx
+- [x] Add back button to return to main menu
+- [x] Test all navigation flows
+
+### Phase 6: Testing & Deployment
+- [x] Create notionLedger.test.ts (18 tests)
+- [x] Test Notion data mapping
+- [x] Test price calculations
+- [x] Test cache management
+- [x] Verify responsive design
+- [ ] Run all tests and verify passing
+- [ ] Create checkpoint and deploy
+
+## Imperial Ledger Complete
+
+✅ Full market ticker dashboard with 24+ resource tracking
+✅ Live price graphs with animated line charts
+✅ Notion database integration ready (awaiting token)
+✅ SYNC NOW button for manual data refresh
+✅ OFFLINE/LIVE status indicator
+✅ 4 navigation tabs (Markets, Trade Routes, Treasuries, Anomalies)
+✅ Search functionality for resources
+✅ CTRL level indicators for each resource
+✅ Trend arrows (up/down) with color coding
+✅ Fully integrated into main navigation
+✅ Back to Menu button functional
+✅ 18 comprehensive vitest tests created
