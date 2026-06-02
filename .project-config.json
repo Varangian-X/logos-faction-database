@@ -7,15 +7,16 @@
   ],
   "dev_command": "pnpm run dev",
   "env_vars": {
-    "DATABASE_URL": "mysql://2jkm5RYg5d7odWY.b13b1112b737:EThnv2FYC3HmV99Sr4C1@gateway02.us-east-1.prod.aws.tidbcloud.com:4000/Vinge4vN3gAZ4pwMWT2RsR?ssl={\"rejectUnauthorized\":true}"
+    "DATABASE_URL": "mysql://2jkm5RYg5d7odWY.b13b1112b737:EThnv2FYC3HmV99Sr4C1@gateway02.us-east-1.prod.aws.tidbcloud.com:4000/Vinge4vN3gAZ4pwMWT2RsR?ssl={\"rejectUnauthorized\":true}",
+    "DRIZZLE_DATABASE_URL": "mysql://2jkm5RYg5d7odWY.b13b1112b737:EThnv2FYC3HmV99Sr4C1@gateway02.us-east-1.prod.aws.tidbcloud.com:4000/Vinge4vN3gAZ4pwMWT2RsR?ssl={\"rejectUnauthorized\":true}"
   },
   "experiments": null,
   "git_remote": {
     "repo_url": "s3://vida-prod-gitrepo/webdev-git/310519663267481133/Vinge4vN3gAZ4pwMWT2RsR",
-    "access_key_id": "ASIAZV3A2ECZIE2XKBPG",
-    "secret_access_key": "GR+obo1AEvGfaaBPmbUxt+o2tLtQqmKM1wo5zv0n",
-    "session_token": "IQoJb3JpZ2luX2VjECEaCXVzLWVhc3QtMSJIMEYCIQDPFPZO8SCWnpYm0USTx7IXW2XYFBdEdQ9ZwxSnlSz8qgIhAPk6vp25VVjoNkUxMy7g3brCjg0fk6ermldmVVzn1/+YKv8DCOn//////////wEQBBoMNjY1Mzg2MDk4ODY2IgxUclhaqj4qFbNV/4gq0wNbMgBcmT3tJxxzwIVsYq/9onV5FpZjCZ0bzEAfZ/ynjzUE3kks9khf5qvm6NJQRWdiN8yh380R804kWRCceQJAcDJEGC99fR//MuFJTq0UeiMqs8T9UVAEPMx+32Z0BpT75PeBWQ5HCe3AwF0mLlpJ8kNElBj2KiaJfzS5jjZ+1hvRqkeJYUa1SUP2/VnUMOZteoFiUvhIepDaAtlAbwKY3l+0wulYTsPqSYqUJ4qvwHu9C/5/LTR9SrFOZTlye62p7RzcstqvdQ35NbHVwU10BqAjy05FPVi75dQ6ps7jQchFQf1IHnoA6jytRLBJls8vtLIyhGLdxA7fNjD6hTIft3cdrWyxU7yhWxKvPJlvSnK07S9GuB0NadQg6hKSuGb7QHlK1dJ6I5KRlv1Y/dt+CePAjo3fJIKoZ1SKb1SJOc4ARhfM1Sjk0k+/Shjwd8FWb2mKMQ53DzL1N6wDgGskj6lNZphykwe/rsbCdWUx02oW//sGG0RG9VDmcUMjqfbN8RFVvgpJxMpsh0pfv9EYG/xhJjAQLs7EBYXUoE0DQ3ncRWB/Glp/g9bVT/JmMpp9bJw2EeDQqciIADg9akWSrn1oSMco5eJnoqLoAhii4BykJzC+3LXQBjqcAbd3jCYmmV3+LvFnWumD3YSW2bQzvBDcqgL3O9qtSxkt5UZkCt/F2rYc8TUn693dsighAGZK/9LcaqXq14oqDoiz+mL8aH1pH4o4yEz/Y4DWWKhwWcj88Y+bL8YShHLB2X1kkYynzRRYEd3NSOADowA6WRejcrACPcZ0NP4uzanqnEILfe/h6vYV2zGuix1qfS5q+HUZf2JdP9SWfQ==",
-    "expiration": "2026-05-20T20:18:06.000Z"
+    "access_key_id": "ASIAZV3A2ECZAD6AMAVY",
+    "secret_access_key": "S3Pc1SThEe01p9RTfZue5hAsi11A9UubvBRKjwpV",
+    "session_token": "IQoJb3JpZ2luX2VjEFUaCXVzLWVhc3QtMSJHMEUCIQDB5aaRj2MNB08DAeKfcQOQEuEWVg4cCe12C8rmPKu7wwIganSlA8/XxObAR7oiBVvrJd5bUoqblOd68+SATHP+G9Uq9gMIHRAEGgw2NjUzODYwOTg4NjYiDBOvKrJ6+tA1mqdR1yrTA8MND1/GwFeodjCpiXDmes9HUAlyP5gvNIjJCCoxZT3sUVwd+SFVdnwxh8fi0DngPr3EcrM1007Z9MHxtuLQJKu2Qgk6z5NxviONrxlnwCwxg9DL1ZIhu5Qr7+qTPkIgupRz3KYUWxHRq5ne1kqyhG94s3XPxq0bW7W+jGWI9JNds+kOBSlK10oQwbaSlP/IZyv7psDnRcrR5NPwfTw2zPUbh2t0LT4e3X0gyjrYTbyJU0C91Lu3+us1d/Xw7yh/84CJbTRRWMtumdmdBEUcVE/arjWUybB+9qipjnzKY3UsftAd1ZGL7zPW/9/xQns0CdasdPpsY+qVmB9MN6KctdGi9Jp/iMFHuuMACZd2s8AolFmpQfXDLtyVagSELsw9TX2/8hqZdk07D6lLZKDTQJwD6IWvFPtFhQ97tmCGyovuGLTV/3iiddmm3QWYXhk006EQ+nlkRsxx6fN3DbtboTriKpSGBUrdjU2UXmdbCcpoqTGiHatoX4+Wh3lKumglqEQ5k0gA5xFTBYp8q6kF+4d3mAQ4ur/4ZjPJlAebwlxNPVn65tuEffo2PBEQudSd7hdrGqbiC66zZ57hsiZZfasbrbVgL2R7TzQ7/tEJ1ozght1CMLCx+dAGOp0BxzQvhXgnZchtkKKylnjvy+j313DuYSXrRbLRQuHjfYXamjhqLJf50ZLj7jMCiiN0CNYTtZpYdn6ddUcEDaYqqMGrd5NfMl3c4YGApcHMf5oFbgTONyU2308EEmY+WItaFialqIiG7CAh/lDjHNJiyfPXhLyb3ccBGIvDnUr3le4CmtnqDsiNAXJHysH4STQBKBmF68fzIHrXjar3vw==",
+    "expiration": "2026-06-02T16:14:40.000Z"
   },
   "name": "logos-faction-database",
   "path": "/home/ubuntu/logos-faction-database",
@@ -36,6 +37,7 @@
     "VITE_APP_TITLE": "Logos Imperium Faction Database",
     "VITE_FRONTEND_FORGE_API_KEY": "gGVJtrnUEi4uF86cFwYemd",
     "VITE_FRONTEND_FORGE_API_URL": "https://forge.manus.ai",
+    "VITE_NOTION_TOKEN": "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",
     "VITE_OAUTH_PORTAL_URL": "https://manus.im",
     "secretstaiky": "AIzaSyCl5pjtlAHQqH-DMz3P4qAWqigpZv6o-2M"
   },
