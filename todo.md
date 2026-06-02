@@ -203,3 +203,58 @@ Fully functional faction-driven market with:
 ✅ 22 comprehensive vitest tests (100% passing)
 ✅ Collapsible UI in Dynamic Market page
 ✅ Ready for production use
+
+
+## Notion Schemas Integration - Phase 2
+
+### Phase 1: Notion API Client
+- [x] Create notionClient.ts with fetch functions
+- [x] Implement fetchNotionFactions() for Factions Registry
+- [x] Implement fetchNotionResources() for Resources Registry
+- [x] Add token validation and error handling
+- [x] Create NotionFaction and NotionResource types
+
+### Phase 2: Schema Mapping
+- [x] Create notionMarketMapper.ts
+- [x] Map Notion Resources to MarketItems
+- [x] Map Notion Factions to faction data
+- [x] Implement market status modifiers (Inflationary, Depressed, etc.)
+- [x] Create price calculation with modifiers
+- [x] Add filtering utilities (by node, value, trend)
+
+### Phase 3: React Integration
+- [x] Create useNotionMarketSync hook
+- [x] Implement token authentication
+- [x] Add auto-sync capability
+- [x] Create search and filter functions
+- [x] Add localStorage persistence
+
+### Phase 4: UI Components
+- [x] Create NotionMarketConfig component
+- [x] Add token input dialog
+- [x] Implement sync button with loading states
+- [x] Add authentication status display
+- [x] Show last sync timestamp
+- [x] Integrate into Dynamic Market page
+
+### Phase 5: Testing
+- [x] Create notionIntegration.test.ts
+- [x] Write 12 comprehensive tests
+- [x] Test all mapping functions
+- [x] Test price calculations
+- [x] Test filtering logic
+- [x] All tests passing (12/12)
+
+## Notion Schemas Integration Complete
+
+✅ Live Notion Factions Registry integration
+✅ Live Notion Resources Registry integration
+✅ Automatic schema mapping to market items
+✅ Market status modifiers (Inflationary/Depressed/etc.)
+✅ Strategic value to rarity mapping
+✅ Market node and trend filtering
+✅ NotionMarketConfig UI component
+✅ useNotionMarketSync React hook
+✅ Token authentication with localStorage
+✅ 12 comprehensive vitest tests (100% passing)
+✅ Ready to connect to your Notion databases

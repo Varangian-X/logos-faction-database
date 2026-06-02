@@ -46,6 +46,8 @@ import { getFactionMetrics } from '@/lib/factionMetrics';
 import { calculatePendulumState } from '@/lib/byzantinePendulum';
 import { MarketStateManager } from '@/components/MarketStateManager';
 import { createMarketStateFromNotionData, type MarketStateSnapshot } from '@/lib/marketState';
+import { NotionMarketConfig } from '@/components/NotionMarketConfig';
+import { useNotionMarketSync } from '@/hooks/useNotionMarketSync';
 
 /**
  * Dynamic Market Interface
@@ -54,6 +56,9 @@ import { createMarketStateFromNotionData, type MarketStateSnapshot } from '@/lib
  */
 
 export default function DynamicMarket() {
+  // Initialize Notion sync
+  const notionSync = useNotionMarketSync({ autoSync: false });
+  
   // Initialize player standings (in real game, this would come from game state)
   const [playerStandings] = useState<PlayerFactionStanding[]>(initializeDefaultStandings());
   const [playerCredits] = useState<number>(100000); // Mock player credits
@@ -153,8 +158,27 @@ export default function DynamicMarket() {
 
   return (
     <div className="min-h-screen bg-[#0A0E17] text-white p-6">
-      {/* Market State Manager */}
-      <div className="max-w-7xl mx-auto mb-6">
+      {/* Notion Integration & Market State Manager */}
+      <div className="max-w-7xl mx-auto mb-6 space-y-4">
+        {/* Notion Configuration */}
+        <details className="group">
+          <summary className="cursor-pointer flex items-center gap-2 text-sm font-mono text-[#D4AF37]/70 hover:text-[#D4AF37] transition-colors">
+            <span className="group-open:rotate-90 transition-transform">▶</span>
+            NOTION INTEGRATION
+          </summary>
+          <div className="mt-4">
+            <NotionMarketConfig
+              isAuthenticated={notionSync.isAuthenticated}
+              isLoading={notionSync.isLoading}
+              error={notionSync.error}
+              lastSync={notionSync.lastSync}
+              onAuthenticate={notionSync.authenticateNotion}
+              onSync={notionSync.syncFromNotion}
+            />
+          </div>
+        </details>
+
+        {/* Market State Manager */}
         <details className="group">
           <summary className="cursor-pointer flex items-center gap-2 text-sm font-mono text-[#D4AF37]/70 hover:text-[#D4AF37] transition-colors mb-4">
             <span className="group-open:rotate-90 transition-transform">▶</span>
