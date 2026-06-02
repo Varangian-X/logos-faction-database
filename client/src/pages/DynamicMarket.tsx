@@ -44,10 +44,13 @@ import {
 import { initializeDefaultStandings, type PlayerFactionStanding } from '@/lib/factionStanding';
 import { getFactionMetrics } from '@/lib/factionMetrics';
 import { calculatePendulumState } from '@/lib/byzantinePendulum';
+import { MarketStateManager } from '@/components/MarketStateManager';
+import { createMarketStateFromNotionData, type MarketStateSnapshot } from '@/lib/marketState';
 
 /**
  * Dynamic Market Interface
  * Faction-driven pricing with real-time modifiers
+ * Integrated with JSON state management and Notion push-back
  */
 
 export default function DynamicMarket() {
@@ -60,6 +63,30 @@ export default function DynamicMarket() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState<MarketItem | null>(null);
   const [cart, setCart] = useState<Array<{ item: MarketItem; quantity: number }>>([]);
+  
+  // Market state management
+  const [marketState, setMarketState] = useState<MarketStateSnapshot>(() => {
+    const catalogItems = getAllItems().map((item) => ({
+      ...item,
+      resourceId: item.id,
+      strategicValue: 'Medium',
+      status: 'Expected' as const,
+      marketTrends: 'Stable',
+      marketNodes: 'All',
+      factionId: item.factionId || undefined,
+    }));
+    return createMarketStateFromNotionData([], catalogItems as any);
+  });
+  
+  // Handle state import
+  const handleStateImported = (newState: MarketStateSnapshot) => {
+    setMarketState(newState);
+  };
+  
+  // Handle state export
+  const handleStateExported = (state: MarketStateSnapshot) => {
+    console.log('Market state exported:', state);
+  };
 
   // Calculate active factions for Pendulum state
   const activeFactionIds = useMemo(() => 
@@ -126,6 +153,23 @@ export default function DynamicMarket() {
 
   return (
     <div className="min-h-screen bg-[#0A0E17] text-white p-6">
+      {/* Market State Manager */}
+      <div className="max-w-7xl mx-auto mb-6">
+        <details className="group">
+          <summary className="cursor-pointer flex items-center gap-2 text-sm font-mono text-[#D4AF37]/70 hover:text-[#D4AF37] transition-colors mb-4">
+            <span className="group-open:rotate-90 transition-transform">▶</span>
+            MARKET STATE MANAGEMENT
+          </summary>
+          <div className="mt-4 p-4 bg-black/40 border border-[#D4AF37]/20 rounded mb-6">
+            <MarketStateManager
+              currentState={marketState}
+              onStateImported={handleStateImported}
+              onStateExported={handleStateExported}
+            />
+          </div>
+        </details>
+      </div>
+
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-6">
         <div className="flex items-center justify-between mb-2">
